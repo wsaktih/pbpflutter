@@ -342,7 +342,7 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(height: 6),
         const Text(
-          'PBO & Flutter Mobile Architect',
+          'Flutter Mobile Architect',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 15,
