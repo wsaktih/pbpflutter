@@ -78,8 +78,8 @@ class MahasiswaModel {
   factory MahasiswaModel.defaultStudent() {
     return MahasiswaModel(
       nim: '2024091001',
-      nama: 'Ahmad Fauzan',
-      email: 'ahmad.fauzan.dev@kampus.ac.id',
+      nama: 'Wishang',
+      email: 'wishang.dev@kampus.ac.id',
       jurusan: 'Teknik Informatika (Konsentrasi Software Engineering)',
       semester: 4,
       ipk: 3.92,

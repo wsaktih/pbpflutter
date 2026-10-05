@@ -65,8 +65,8 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
       ),
       MahasiswaModel(
         nim: '2024010003',
-        nama: 'Ahmad Fauzan',
-        email: 'ahmad.fauzan@kampus.ac.id',
+        nama: 'Wishang',
+        email: 'wishang@kampus.ac.id',
         jurusan: 'Teknik Informatika',
         semester: 7,
         ipk: 3.85,

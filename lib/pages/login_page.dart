@@ -149,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'Fauzan Dev',
+                    'Wishang',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
@@ -157,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const Text(
-                    'Informatics Engineer • PBO Specialist',
+                    'Informatics Engineer',
                     style: TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
@@ -188,8 +188,7 @@ class _LoginPageState extends State<LoginPage> {
 
         Text(
           'Selamat datang di ruang portofolio digital berbasis Flutter Web. '
-          'Platform ini mengintegrasikan seluruh capaian proyek, implementasi '
-          'Mata Kuliah Pemrograman Berorientasi Objek (PBO), serta rekayasa perangkat lunak modern.',
+          'Platform ini mengintegrasikan seluruh capaian proyek',
           textAlign: isMobile ? TextAlign.center : TextAlign.start,
           style: const TextStyle(
             fontSize: 15,

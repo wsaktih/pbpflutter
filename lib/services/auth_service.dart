@@ -45,9 +45,9 @@ class AuthService extends ChangeNotifier {
   /// Preset 4: Mahasiswa Pengembang / Author
   static MahasiswaAuthorUser get defaultAuthorStudent => MahasiswaAuthorUser(
         id: 'mhs-author-01',
-        username: 'ahmad_fauzan',
-        displayName: 'Ahmad Fauzan (Author & Mahasiswa)',
-        nim: '2024091001',
+        username: 'wishangsakti',
+        displayName: 'Wishang Sakti H',
+        nim: '25051204424',
         avatarUrl: 'assets/images/profile.jpeg',
         programStudi: 'Teknik Informatika (Software Engineering)',
         ipk: 3.92,
@@ -80,7 +80,7 @@ class AuthService extends ChangeNotifier {
     _currentUser = MahasiswaAuthorUser(
       id: 'mhs-$nim',
       username: nim,
-      displayName: 'Ahmad Fauzan ($nim)',
+      displayName: 'Wishang ($nim)',
       nim: nim,
       avatarUrl: 'assets/images/profile.jpeg',
       programStudi: 'Teknik Informatika (Software Engineering)',

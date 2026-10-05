@@ -15,7 +15,7 @@ void main() {
 
     // Verify that title/gateway elements render
     expect(find.text('Visitor Access Pass'), findsOneWidget);
-    expect(find.text('Fauzan Dev'), findsOneWidget);
+    expect(find.text('Wishang'), findsOneWidget);
     expect(find.text('NIM (Nomor Induk Mahasiswa)'), findsOneWidget);
     expect(find.text('Password / Kata Sandi'), findsOneWidget);
   });

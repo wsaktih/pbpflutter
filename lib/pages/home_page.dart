@@ -249,9 +249,7 @@ class _HomePageState extends State<HomePage> {
 
               const Text(
                 'Mahasiswa Teknik Informatika yang berdedikasi membangun perangkat lunak '
-                'berkualitas tinggi. Portofolio ini mendokumentasikan implementasi mendalam '
-                'dari Mata Kuliah Pemrograman Berorientasi Objek (PBO), mencakup hierarki pewarisan '
-                'sistem, enkapsulasi mutasi data, polimorfisme runtime, dan abstraksi antarmuka.',
+                'berkualitas tinggi.',
                 style: TextStyle(
                   fontSize: 15,
                   color: AppColors.textSecondary,
@@ -593,7 +591,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '© 2026 Portofolio Mahasiswa • Tugas Matkul PBO & Flutter Web',
+                '© 2026 Portofolio Mahasiswa',
                 style: TextStyle(fontSize: 12, color: AppColors.textMuted),
               ),
               Text(
