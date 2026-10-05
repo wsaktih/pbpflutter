@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌌 Portofolio Digital & Laboratorium PBO
+# 🌌 Portofolio Digital
 
 **Aplikasi portofolio mahasiswa berbasis Flutter Web dengan tema _Minimalis Elegan_ (dark mode),
 animasi kosmik, model 3D interaktif**
