@@ -129,7 +129,7 @@ class NavBar extends StatelessWidget {
               if (isDesktop) ...[
                 _buildNavLink('Tentang', onScrollToAbout),
                 _buildNavLink('Sertifikat', onScrollToPbo),
-                _buildNavLink('Proyek & Tugas', onScrollToProjects),
+                _buildNavLink('Koleksi Project', onScrollToProjects),
                 _buildActionLink(
                   icon: Icons.view_in_ar_rounded,
                   label: 'Profil 3D Holo',

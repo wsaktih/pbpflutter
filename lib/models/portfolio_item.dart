@@ -7,10 +7,12 @@ import '../theme/app_colors.dart';
 /// ============================================================================
 
 enum PortfolioCategory {
-  all('Semua Koleksi', Icons.dashboard_rounded),
-  pbo('Tugas Matkul PBO', Icons.account_tree_rounded),
-  mobile('Aplikasi Mobile', Icons.phone_android_rounded),
-  web('Web & Backend', Icons.language_rounded);
+  all('Semua', Icons.grid_view_rounded),
+  cybersecurity('Cybersecurity', Icons.security_rounded),
+  webDev('Web Dev', Icons.language_rounded),
+  mobileDev('Mobile Dev', Icons.phone_android_rounded),
+  iot('IoT', Icons.sensors_rounded),
+  aiEngineering('AI Engineering', Icons.psychology_rounded);
 
   final String label;
   final IconData icon;
@@ -28,9 +30,12 @@ abstract class PortfolioItem {
   final String title;
   final String shortDescription;
   final String detailedDescription;
-  final PortfolioCategory category;
+  final String projectOutput;
+  final List<PortfolioCategory> categories;
   final List<String> techStack;
   final String dateCreated;
+  final String repoUrl;
+  final String? liveUrl;
   final bool isFeatured;
 
   // Enkapsulasi: State interaktif yang dimutasi via method & setter
@@ -44,9 +49,12 @@ abstract class PortfolioItem {
     required this.title,
     required this.shortDescription,
     required this.detailedDescription,
-    required this.category,
+    required this.projectOutput,
+    required this.categories,
     required this.techStack,
     required this.dateCreated,
+    required this.repoUrl,
+    this.liveUrl,
     this.isFeatured = false,
     int viewsCount = 120,
     int likesCount = 28,
@@ -92,6 +100,11 @@ abstract class PortfolioItem {
     _isBookmarked = !_isBookmarked;
   }
 
+  bool belongsToCategory(PortfolioCategory category) {
+    if (category == PortfolioCategory.all) return true;
+    return categories.contains(category);
+  }
+
   // Polimorfisme: Setiap kategori memiliki badge, aksen warna, dan metrik berbeda
   Color getCategoryColor();
   String getCategoryBadge();
@@ -100,12 +113,112 @@ abstract class PortfolioItem {
 }
 
 /// ============================================================================
-/// SUBCLASS PBO: Tugas & Proyek Matkul Pemrograman Berorientasi Objek
-/// Menghubungkan secara nyata materi kuliah PBO ke dalam arsitektur aplikasi
+/// SUBCLASS: Proyek Keamanan Siber & Rekayasa Kecerdasan Buatan (AI)
+/// Khusus untuk proyek CyberSecurity & AI Engineering dari GitHub @wsaktih
+/// ============================================================================
+class SecurityAiProjectItem extends PortfolioItem implements InteractiveDemonstrable {
+  final String threatDomain;
+  final String aiModelUsed;
+
+  SecurityAiProjectItem({
+    required super.id,
+    required super.title,
+    required super.shortDescription,
+    required super.detailedDescription,
+    required super.projectOutput,
+    required super.categories,
+    required super.techStack,
+    required super.dateCreated,
+    required super.repoUrl,
+    super.liveUrl,
+    super.isFeatured = true,
+    required this.threatDomain,
+    required this.aiModelUsed,
+  });
+
+  @override
+  Color getCategoryColor() => AppColors.secondary;
+
+  @override
+  String getCategoryBadge() => 'CYBERSECURITY & AI';
+
+  @override
+  IconData getItemIcon() => Icons.security_rounded;
+
+  @override
+  Map<String, String> getMetadataAttributes() => {
+        'Domain Keamanan': threatDomain,
+        'Engine / Model AI': aiModelUsed,
+        'Repositori GitHub': repoUrl,
+        'Status Proyek': '✅ Terverifikasi di GitHub @wsaktih',
+      };
+
+  @override
+  String runInteractiveDemonstration() {
+    return '''
+[SECURITY & AI ENGINE - GITHUB @wsaktih]
+- Proyek Terverifikasi: $title
+- Domain Ancaman: $threatDomain
+- Model Engine: $aiModelUsed
+- Tautan Repo: $repoUrl
+- Verifikasi: Proyek asli terdaftar pada repositori GitHub @wsaktih.
+''';
+  }
+}
+
+/// ============================================================================
+/// SUBCLASS: Proyek Aplikasi Software / Mobile / Web
+/// Khusus untuk proyek Mobile Dev & Web Dev dari GitHub @wsaktih
+/// ============================================================================
+class SoftwareAppItem extends PortfolioItem {
+  final String platform;
+  final String framework;
+  final int totalStars;
+
+  SoftwareAppItem({
+    required super.id,
+    required super.title,
+    required super.shortDescription,
+    required super.detailedDescription,
+    required super.projectOutput,
+    required super.categories,
+    required super.techStack,
+    required super.dateCreated,
+    required super.repoUrl,
+    super.liveUrl,
+    this.platform = 'Cross-Platform (Web & Mobile)',
+    this.framework = 'Flutter & Dart',
+    this.totalStars = 48,
+    super.isFeatured = true,
+  });
+
+  @override
+  Color getCategoryColor() => AppColors.primaryLight;
+
+  @override
+  String getCategoryBadge() => 'PROYEK $platform';
+
+  @override
+  IconData getItemIcon() =>
+      categories.contains(PortfolioCategory.mobileDev)
+          ? Icons.smartphone_rounded
+          : Icons.code_rounded;
+
+  @override
+  Map<String, String> getMetadataAttributes() => {
+        'Platform': platform,
+        'Framework': framework,
+        'Repositori': repoUrl,
+        'Apresiasi': '⭐ $totalStars Stars',
+      };
+}
+
+/// ============================================================================
+/// SUBCLASS LEGACY: Tugas & Proyek Matkul Pemrograman Berorientasi Objek
 /// ============================================================================
 class PboCourseworkItem extends PortfolioItem implements InteractiveDemonstrable {
-  final String courseSemester; // Contoh: 'Semester 4 - PBO Kelas D'
-  final List<String> pboPrinciplesUsed; // e.g., 'Inheritance', 'Polymorphism', 'Encapsulation'
+  final String courseSemester;
+  final List<String> pboPrinciplesUsed;
   final String classHierarchyDescription;
   final String sourceCodeSample;
   final String simulatedExecutionLog;
@@ -115,15 +228,18 @@ class PboCourseworkItem extends PortfolioItem implements InteractiveDemonstrable
     required super.title,
     required super.shortDescription,
     required super.detailedDescription,
+    required super.projectOutput,
+    required super.categories,
     required super.techStack,
     required super.dateCreated,
+    required super.repoUrl,
+    super.liveUrl,
     required this.courseSemester,
     required this.pboPrinciplesUsed,
     required this.classHierarchyDescription,
     required this.sourceCodeSample,
     required this.simulatedExecutionLog,
-    super.category = PortfolioCategory.pbo,
-    super.isFeatured = true,
+    super.isFeatured = false,
   });
 
   @override
@@ -150,50 +266,6 @@ class PboCourseworkItem extends PortfolioItem implements InteractiveDemonstrable
 - Menginstansiasi Objek Hirarki...
 - Prinsip Aktif: ${pboPrinciplesUsed.join(' + ')}
 $simulatedExecutionLog
-- Status: Objek dialokasikan ke memori secara dinamis tanpa kebocoran.
 ''';
   }
-}
-
-/// ============================================================================
-/// SUBCLASS: Proyek Aplikasi Software / Mobile
-/// ============================================================================
-class SoftwareAppItem extends PortfolioItem {
-  final String platform;
-  final String repoUrl;
-  final String demoUrl;
-  final int totalStars;
-
-  SoftwareAppItem({
-    required super.id,
-    required super.title,
-    required super.shortDescription,
-    required super.detailedDescription,
-    required super.category,
-    required super.techStack,
-    required super.dateCreated,
-    required this.platform,
-    this.repoUrl = 'https://github.com/developer/portfolio',
-    this.demoUrl = 'https://demo.portfolio.dev',
-    this.totalStars = 48,
-    super.isFeatured = false,
-  });
-
-  @override
-  Color getCategoryColor() => AppColors.secondaryLight;
-
-  @override
-  String getCategoryBadge() => 'PROYEK $platform';
-
-  @override
-  IconData getItemIcon() =>
-      category == PortfolioCategory.mobile ? Icons.smartphone_rounded : Icons.code_rounded;
-
-  @override
-  Map<String, String> getMetadataAttributes() => {
-        'Platform': platform,
-        'Apresiasi': '⭐ $totalStars Stars',
-        'Versi Rilis': 'v2.1.0-stable',
-        'Arsitektur': 'Clean Architecture & BLoC/Provider',
-      };
 }

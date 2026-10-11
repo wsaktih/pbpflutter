@@ -255,6 +255,18 @@ class _Profile3DInspectorDialogState extends State<Profile3DInspectorDialog>
 
   /// Viewport 3D Interaktif dengan Trackball Drag & Multi-plane Parallax
   Widget _build3DViewport() {
+    final baseTransform = Matrix4.identity()
+      ..setEntry(3, 2, _perspectiveDepth)
+      ..scale(_zoomScale)
+      ..rotateX(_rotX)
+      ..rotateY(_rotY)
+      ..rotateZ(_rotZ);
+
+    const avatarSize = 220.0;
+    const double halfDepth = 10.0; // Ketebalan fisik agak tebal padat (total tebal 20px)
+    final double coinRadius = (avatarSize + 16) / 2;
+    final isFrontFacing = cos(_rotY) * cos(_rotX) >= 0;
+
     return GestureDetector(
       onPanStart: (_) {
         if (_isAutoSpin) {
@@ -309,63 +321,144 @@ class _Profile3DInspectorDialogState extends State<Profile3DInspectorDialog>
               ),
             ),
 
-            // 4. Objek 3D Inti dengan Transformasi Matrix4
+            // 3. Lapisan Satelit Orbit Belakang (Z < 0) - Occluded di balik medali
+            if (_showOrbitParticles)
+              Transform(
+                alignment: Alignment.center,
+                transform: baseTransform,
+                child: Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: _buildFloatingSatellites(avatarSize / 2, isFront: false),
+                ),
+              ),
+
+            // 4. Ambient Halo Shadow di Belakang Medali
             Transform(
               alignment: Alignment.center,
-              transform: Matrix4.identity()
-                ..setEntry(3, 2, _perspectiveDepth)
-                ..scale(_zoomScale)
-                ..rotateX(_rotX)
-                ..rotateY(_rotY)
-                ..rotateZ(_rotZ),
-              child: _buildCore3DAvatarObject(),
+              transform: baseTransform,
+              child: _buildHaloShadow(avatarSize),
             ),
+
+            // 5. Giroskop Wireframe Rings di sekeliling profil
+            if (_showGyroscope)
+              Transform(
+                alignment: Alignment.center,
+                transform: baseTransform,
+                child: CustomPaint(
+                  size: const Size(avatarSize + 70, avatarSize + 70),
+                  painter: _Gyroscope3DPainter(
+                    rotX: _rotX,
+                    rotY: _rotY,
+                    color: AppColors.secondary,
+                  ),
+                ),
+              ),
+
+            // 6. Muka Belakang Koin (Occluded Face tergantung arah rotasi kamera)
+            Transform(
+              alignment: Alignment.center,
+              transform: baseTransform,
+              child: isFrontFacing
+                  ? _buildMedallionBackFace(avatarSize, halfDepth)
+                  : _buildMedallionFrontFace(avatarSize, halfDepth),
+            ),
+
+            // 7. Dinding Silinder 3D Padat & Tebal (Solid 3D Continuous Mantle - Bukan Duplikat Slices)
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _Solid3DCylinderPainter(
+                  matrix: baseTransform,
+                  radius: coinRadius,
+                  halfDepth: halfDepth,
+                  accentColor: _currentSkin == 'hologram' ? AppColors.secondary : AppColors.primaryLight,
+                ),
+              ),
+            ),
+
+            // 8. Muka Depan Koin (Front-Facing Face menghadap kamera)
+            Transform(
+              alignment: Alignment.center,
+              transform: baseTransform,
+              child: isFrontFacing
+                  ? _buildMedallionFrontFace(avatarSize, halfDepth)
+                  : _buildMedallionBackFace(avatarSize, halfDepth),
+            ),
+
+            // 9. Lapisan Satelit Orbit Depan (Z >= 0) - Mengorbit melayang di depan
+            if (_showOrbitParticles)
+              Transform(
+                alignment: Alignment.center,
+                transform: baseTransform,
+                child: Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: _buildFloatingSatellites(avatarSize / 2, isFront: true),
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 
-  /// Objek Inti Profil 3D (Lapisan Parallax, Glow, Cincin Giroskop & Refleksi Kaca)
-  Widget _buildCore3DAvatarObject() {
-    const avatarSize = 220.0;
+  /// Ambient Halo Shadow di Belakang Medali
+  Widget _buildHaloShadow(double avatarSize) {
     final lightOffsetX = -sin(_rotY) * 35;
     final lightOffsetY = sin(_rotX) * 35;
 
+    return Container(
+      width: avatarSize + 40,
+      height: avatarSize + 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: (_currentSkin == 'hologram' ? AppColors.secondary : AppColors.primary)
+                .withOpacity(0.4),
+            blurRadius: 50,
+            spreadRadius: 8,
+            offset: Offset(lightOffsetX * 0.8, lightOffsetY * 0.8),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Muka Depan Avatar Medallion (Z = +halfDepth)
+  Widget _buildMedallionFrontFace(double avatarSize, double halfDepth) {
+    return SizedBox(
+      width: avatarSize + 16,
+      height: avatarSize + 16,
+      child: Transform(
+        transform: Matrix4.identity()..translate(0.0, 0.0, halfDepth),
+        alignment: Alignment.center,
+        child: _buildMedallionFaceContent(avatarSize, isBack: false),
+      ),
+    );
+  }
+
+  /// Muka Belakang Avatar Medallion (Z = -halfDepth) - Menampilkan foto yang sama dengan muka depan
+  Widget _buildMedallionBackFace(double avatarSize, double halfDepth) {
+    return SizedBox(
+      width: avatarSize + 16,
+      height: avatarSize + 16,
+      child: Transform(
+        transform: Matrix4.identity()
+          ..translate(0.0, 0.0, -halfDepth)
+          ..rotateY(pi),
+        alignment: Alignment.center,
+        child: _buildMedallionFaceContent(avatarSize, isBack: true),
+      ),
+    );
+  }
+
+  /// Konten Muka Medali Avatar 3D (Dipakai identik untuk Muka Depan & Muka Belakang)
+  Widget _buildMedallionFaceContent(double avatarSize, {required bool isBack}) {
     return Stack(
       alignment: Alignment.center,
-      clipBehavior: Clip.none,
       children: [
-        // Lapisan 1: 3D Outer Halo Shadow (bergeser berlawanan dengan arah cahaya)
-        Container(
-          width: avatarSize + 40,
-          height: avatarSize + 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: (_currentSkin == 'hologram' ? AppColors.secondary : AppColors.primary)
-                    .withOpacity(0.4),
-                blurRadius: 50,
-                spreadRadius: 8,
-                offset: Offset(lightOffsetX * 0.8, lightOffsetY * 0.8),
-              ),
-            ],
-          ),
-        ),
-
-        // Lapisan 2: Giroskop Wireframe Rings di sekeliling profil
-        if (_showGyroscope)
-          CustomPaint(
-            size: const Size(avatarSize + 70, avatarSize + 70),
-            painter: _Gyroscope3DPainter(
-              rotX: _rotX,
-              rotY: _rotY,
-              color: AppColors.secondary,
-            ),
-          ),
-
-        // Lapisan 3: Beveled Metallic Base Ring
+        // Beveled Metallic Base Ring
         Container(
           width: avatarSize + 16,
           height: avatarSize + 16,
@@ -379,19 +472,19 @@ class _Profile3DInspectorDialogState extends State<Profile3DInspectorDialog>
                 AppColors.accentRose,
                 AppColors.primary,
               ],
-              transform: GradientRotation(_rotY * 0.5),
+              transform: GradientRotation(_rotY * 0.5 + (isBack ? pi : 0.0)),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.7),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                color: AppColors.secondary.withOpacity(0.25),
+                blurRadius: 18,
+                spreadRadius: 2,
               ),
             ],
           ),
         ),
 
-        // Lapisan 4: Inner Core Bezel
+        // Inner Core Bezel
         Container(
           width: avatarSize + 6,
           height: avatarSize + 6,
@@ -401,7 +494,7 @@ class _Profile3DInspectorDialogState extends State<Profile3DInspectorDialog>
           ),
         ),
 
-        // Lapisan 5: Avatar Image Display (Sesuai Skin yang dipilih)
+        // Avatar Image Display (Foto profil yang sama, adaptif mengikuti Skin)
         ClipOval(
           child: SizedBox(
             width: avatarSize,
@@ -410,7 +503,7 @@ class _Profile3DInspectorDialogState extends State<Profile3DInspectorDialog>
           ),
         ),
 
-        // Lapisan 6: Efek Hologram Scanlines Animated
+        // Efek Hologram Scanlines Animated
         if (_showScanlines)
           ClipOval(
             child: SizedBox(
@@ -432,14 +525,17 @@ class _Profile3DInspectorDialogState extends State<Profile3DInspectorDialog>
             ),
           ),
 
-        // Lapisan 7: Specular Glass Lens Reflection (Glint highlight yang bergerak dinamis)
+        // Specular Glass Lens Reflection (Glint highlight 3D dinamis)
         ClipOval(
           child: Container(
             width: avatarSize,
             height: avatarSize,
             decoration: BoxDecoration(
               gradient: RadialGradient(
-                center: Alignment(-sin(_rotY) * 0.9 - 0.2, -sin(_rotX) * 0.9 - 0.2),
+                center: Alignment(
+                  (isBack ? sin(_rotY) : -sin(_rotY)) * 0.9 - 0.2,
+                  -sin(_rotX) * 0.9 - 0.2,
+                ),
                 radius: 0.8,
                 colors: [
                   Colors.white.withOpacity(0.40),
@@ -451,29 +547,31 @@ class _Profile3DInspectorDialogState extends State<Profile3DInspectorDialog>
             ),
           ),
         ),
-
-        // Lapisan 8: Floating 3D Micro-Chips mengorbit avatar (Flutter, PBO A+, Dart, Architect)
-        if (_showOrbitParticles) ..._buildFloatingSatellites(avatarSize / 2),
       ],
     );
   }
 
-  /// Satelit Floating 3D yang mengorbit dengan kedalaman Z
-  List<Widget> _buildFloatingSatellites(double radius) {
+  /// Satelit Floating 3D yang mengorbit dengan kedalaman Z nyata (Cybersecurity, IoT, Software Engineering, AI Engineering)
+  List<Widget> _buildFloatingSatellites(double radius, {required bool isFront}) {
     final satellites = [
-      {'label': 'Flutter 3D', 'icon': Icons.flutter_dash, 'color': AppColors.secondary},
-      {'label': 'PBO A+ (4.00)', 'icon': Icons.verified_rounded, 'color': AppColors.accent},
-      {'label': 'Dart OOP', 'icon': Icons.code_rounded, 'color': AppColors.primaryLight},
-      {'label': 'Software Architect', 'icon': Icons.architecture_rounded, 'color': AppColors.accentRose},
+      {'label': 'Cybersecurity', 'icon': Icons.security_rounded, 'color': AppColors.secondary},
+      {'label': 'IoT', 'icon': Icons.sensors_rounded, 'color': const Color(0xFF10B981)},
+      {'label': 'Software Engineering', 'icon': Icons.code_rounded, 'color': AppColors.primaryLight},
+      {'label': 'AI Engineering', 'icon': Icons.psychology_rounded, 'color': AppColors.accentRose},
     ];
 
     final widgets = <Widget>[];
 
     for (int i = 0; i < satellites.length; i++) {
       final baseAngle = (_rotY * 0.8) + (i * (pi / 2));
-      final x = cos(baseAngle) * (radius + 48);
-      final y = sin(baseAngle) * (radius * 0.45) + (sin(_rotX) * 20);
       final z = sin(baseAngle); // -1.0 (belakang) s/d +1.0 (depan)
+
+      // Depth sorting nyata: filter depan vs belakang
+      if (isFront && z < 0) continue;
+      if (!isFront && z >= 0) continue;
+
+      final x = cos(baseAngle) * (radius + 54);
+      final y = sin(baseAngle) * (radius * 0.45) + (sin(_rotX) * 20);
 
       // Skala dan opacity berubah berdasarkan kedalaman 3D
       final scale = 0.85 + (z * 0.2);
@@ -1023,3 +1121,174 @@ class _ScanlineEffectPainter extends CustomPainter {
     return oldDelegate.progress != progress;
   }
 }
+
+/// Custom Painter untuk Dinding Silinder 3D Padat & Tebal (Solid 3D Continuous Mantle)
+/// Menggambar permukaan samping koin silinder secara kontinu dengan directional metallic lighting,
+/// tanpa menggunakan irisan/duplikasi layer bertumpuk.
+class _Solid3DCylinderPainter extends CustomPainter {
+  final Matrix4 matrix;
+  final double radius;
+  final double halfDepth;
+  final Color accentColor;
+
+  _Solid3DCylinderPainter({
+    required this.matrix,
+    required this.radius,
+    required this.halfDepth,
+    required this.accentColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final m = matrix.storage;
+
+    // Fungsi proyeksi 3D lokal (x, y, z) ke 2D screen pixels
+    Offset project(double x, double y, double z) {
+      final vx = m[0] * x + m[4] * y + m[8] * z + m[12];
+      final vy = m[1] * x + m[5] * y + m[9] * z + m[13];
+      final vw = m[3] * x + m[7] * y + m[11] * z + m[15];
+      final w = vw == 0 ? 1.0 : vw;
+      return Offset(center.dx + vx / w, center.dy + vy / w);
+    }
+
+    // Hitung titik 3D keliling lingkaran depan dan belakang
+    const int segments = 48;
+    final frontPoints = List<Offset>.generate(segments, (i) {
+      final theta = (i * 2 * pi) / segments;
+      return project(radius * cos(theta), radius * sin(theta), halfDepth);
+    });
+
+    final backPoints = List<Offset>.generate(segments, (i) {
+      final theta = (i * 2 * pi) / segments;
+      return project(radius * cos(theta), radius * sin(theta), -halfDepth);
+    });
+
+    // Struktur data untuk quad yang visible
+    final quadsToDraw = <_CylinderQuad>[];
+
+    for (int i = 0; i < segments; i++) {
+      final next = (i + 1) % segments;
+      final midTheta = ((i + 0.5) * 2 * pi) / segments;
+      final nx = cos(midTheta);
+      final ny = sin(midTheta);
+
+      // Normal outward dalam camera space
+      final camNx = m[0] * nx + m[4] * ny;
+      final camNy = m[1] * nx + m[5] * ny;
+      final camNz = m[2] * nx + m[6] * ny;
+
+      // Hanya render quad yang menghadap kamera
+      if (camNz > -0.05) {
+        final f1 = frontPoints[i];
+        final f2 = frontPoints[next];
+        final b1 = backPoints[i];
+        final b2 = backPoints[next];
+
+        // Rata-rata depth z camera untuk depth sorting (pelukis / painter's algorithm)
+        final z1 = m[2] * radius * nx + m[6] * radius * ny + m[10] * halfDepth + m[14];
+        final z2 = m[2] * radius * nx + m[6] * radius * ny - m[10] * halfDepth + m[14];
+        final avgZ = (z1 + z2) / 2;
+
+        quadsToDraw.add(_CylinderQuad(
+          f1: f1,
+          f2: f2,
+          b2: b2,
+          b1: b1,
+          avgZ: avgZ,
+          camNx: camNx,
+          camNy: camNy,
+          camNz: camNz,
+        ));
+      }
+    }
+
+    // Sort berdasarkan Z camera agar quad terjauh digambar terlebih dahulu
+    quadsToDraw.sort((a, b) => a.avgZ.compareTo(b.avgZ));
+
+    // Gambar setiap quad dinding silinder padat
+    for (final quad in quadsToDraw) {
+      // Normalisasi normal kamera
+      final len = sqrt(quad.camNx * quad.camNx + quad.camNy * quad.camNy + quad.camNz * quad.camNz);
+      final nx = len == 0 ? 0.0 : quad.camNx / len;
+      final ny = len == 0 ? 0.0 : quad.camNy / len;
+      final nz = len == 0 ? 0.0 : quad.camNz / len;
+
+      // Vektor cahaya terarah dari kiri atas depan (-0.36, -0.67, 0.65)
+      const lx = -0.36;
+      const ly = -0.67;
+      const lz = 0.65;
+      final diff = (nx * lx + ny * ly + nz * lz).clamp(0.0, 1.0);
+
+      // Specular highlight untuk efek kilau logam CNC
+      final refZ = 2 * diff * nz - lz;
+      final spec = (refZ > 0) ? pow(refZ.clamp(0.0, 1.0), 12).toDouble() : 0.0;
+
+      // Gradasi warna padat metalik titanium
+      const baseDark = Color(0xFF070B14);
+      const steelMid = Color(0xFF1E293B);
+      final highAccent = Color.lerp(accentColor, Colors.white, 0.35)!;
+
+      Color quadColor;
+      if (diff < 0.5) {
+        quadColor = Color.lerp(baseDark, steelMid, diff * 2)!;
+      } else {
+        quadColor = Color.lerp(steelMid, highAccent, (diff - 0.5) * 2)!;
+      }
+      if (spec > 0.05) {
+        quadColor = Color.lerp(quadColor, Colors.white, spec * 0.75)!;
+      }
+
+      final path = Path()
+        ..moveTo(quad.f1.dx, quad.f1.dy)
+        ..lineTo(quad.f2.dx, quad.f2.dy)
+        ..lineTo(quad.b2.dx, quad.b2.dy)
+        ..lineTo(quad.b1.dx, quad.b1.dy)
+        ..close();
+
+      // Isi poligon padat (solid filled quad)
+      final fillPaint = Paint()
+        ..color = quadColor
+        ..style = PaintingStyle.fill;
+      canvas.drawPath(path, fillPaint);
+
+      // Garis tepi halus tekstur milled edge
+      final rimStrokePaint = Paint()
+        ..color = Color.lerp(const Color(0xFF334155), accentColor, diff)!.withOpacity(0.35)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.6;
+      canvas.drawPath(path, rimStrokePaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _Solid3DCylinderPainter oldDelegate) {
+    return oldDelegate.matrix != matrix ||
+        oldDelegate.radius != radius ||
+        oldDelegate.halfDepth != halfDepth ||
+        oldDelegate.accentColor != accentColor;
+  }
+}
+
+class _CylinderQuad {
+  final Offset f1;
+  final Offset f2;
+  final Offset b2;
+  final Offset b1;
+  final double avgZ;
+  final double camNx;
+  final double camNy;
+  final double camNz;
+
+  _CylinderQuad({
+    required this.f1,
+    required this.f2,
+    required this.b2,
+    required this.b1,
+    required this.avgZ,
+    required this.camNx,
+    required this.camNy,
+    required this.camNz,
+  });
+}
+

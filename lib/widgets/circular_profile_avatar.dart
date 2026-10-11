@@ -192,24 +192,37 @@ class _CircularProfileAvatarState extends State<CircularProfileAvatar>
                         // LAPISAN 2: 3D Outer Gyroscope Wireframe Rings
                         _buildGyroscopeRings(totalSize, currentTiltX, currentTiltY),
 
-                        // LAPISAN 3: Rotating Gradient Border
-                        _buildRotatingBorder(totalSize),
+                        // LAPISAN 2.5: Solid Coin Chassis Backing (Ketebalan fisik 3D padat tanpa duplikasi)
+                        _buildSolidCoinBacking(totalSize, currentTiltX, currentTiltY),
 
-                        // LAPISAN 4: Inner Dark Bevel Frame
-                        Container(
-                          width: totalSize + 4,
-                          height: totalSize + 4,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.bgDark,
+                        // LAPISAN 3-6: AVATAR DEPAN DENGAN TRANSLASI Z POSITIF (FRONT FACE 3D)
+                        Transform(
+                          transform: Matrix4.identity()..translate(0.0, 0.0, 6.0),
+                          alignment: Alignment.center,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Rotating Gradient Border
+                              _buildRotatingBorder(totalSize),
+
+                              // Inner Dark Bevel Frame
+                              Container(
+                                width: totalSize + 4,
+                                height: totalSize + 4,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppColors.bgDark,
+                                ),
+                              ),
+
+                              // AVATAR UTAMA (Image Asset 3D / Fallback Network)
+                              _buildAvatarCore(totalSize),
+
+                              // Hologram Specular Lens Reflection (Dynamic 3D Glint)
+                              _buildGlassDomeGlare(totalSize, currentTiltX, currentTiltY),
+                            ],
                           ),
                         ),
-
-                        // LAPISAN 5: AVATAR UTAMA (Image Asset 3D / Fallback Network)
-                        _buildAvatarCore(totalSize),
-
-                        // LAPISAN 6: Hologram Specular Lens Reflection (Dynamic 3D Glint)
-                        _buildGlassDomeGlare(totalSize, currentTiltX, currentTiltY),
 
                         // LAPISAN 7: Satelit Orbit Depan (Z >= 0)
                         if (showSatellites)
@@ -279,6 +292,54 @@ class _CircularProfileAvatarState extends State<CircularProfileAvatar>
           border: Border.all(
             color: AppColors.secondary.withOpacity(0.3),
             width: 1.2,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Lapisan 2.5: Solid Coin Chassis Backing (Ketebalan fisik 3D padat tanpa duplikasi irisan)
+  Widget _buildSolidCoinBacking(double totalSize, double tiltX, double tiltY) {
+    if (widget.radius < 50) return const SizedBox.shrink();
+
+    final depthOffset = Offset(-tiltY * 16, tiltX * 16);
+
+    return Transform(
+      transform: Matrix4.identity()..translate(0.0, 0.0, -4.0),
+      alignment: Alignment.center,
+      child: Transform.translate(
+        offset: depthOffset,
+        child: Container(
+          width: totalSize + 14,
+          height: totalSize + 14,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF1E293B),
+                Color(0xFF0F172A),
+                Color(0xFF070B14),
+              ],
+            ),
+            border: Border.all(
+              color: AppColors.secondary.withOpacity(0.55),
+              width: 2.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.85),
+                offset: depthOffset * 0.9,
+                blurRadius: 18,
+                spreadRadius: 2,
+              ),
+              BoxShadow(
+                color: AppColors.secondary.withOpacity(0.25),
+                offset: depthOffset * 0.4,
+                blurRadius: 8,
+              ),
+            ],
           ),
         ),
       ),
@@ -411,10 +472,10 @@ class _CircularProfileAvatarState extends State<CircularProfileAvatar>
     required double tiltY,
   }) {
     final satellites = [
-      {'label': 'Flutter 3D', 'icon': Icons.flutter_dash, 'color': AppColors.secondary},
-      {'label': 'Dart OOP', 'icon': Icons.code_rounded, 'color': AppColors.primaryLight},
-      {'label': 'PBO A+', 'icon': Icons.bolt_rounded, 'color': AppColors.accent},
-      {'label': 'Architect', 'icon': Icons.layers_rounded, 'color': AppColors.accentRose},
+      {'label': 'Cybersecurity', 'icon': Icons.security_rounded, 'color': AppColors.secondary},
+      {'label': 'IoT', 'icon': Icons.sensors_rounded, 'color': const Color(0xFF10B981)},
+      {'label': 'Software Engineering', 'icon': Icons.code_rounded, 'color': AppColors.primaryLight},
+      {'label': 'AI Engineering', 'icon': Icons.psychology_rounded, 'color': AppColors.accentRose},
     ];
 
     final widgets = <Widget>[];

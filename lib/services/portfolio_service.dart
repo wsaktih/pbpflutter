@@ -2,133 +2,87 @@ import '../models/portfolio_item.dart';
 
 class PortfolioService {
   static final List<PortfolioItem> _items = [
-    PboCourseworkItem(
-      id: 'pbo-01',
-      title: 'Hirarki Akun Game FPS vs MOBA (UTS PBO)',
+    SecurityAiProjectItem(
+      id: 'proj-phishguard',
+      title: 'PhishGuard AI - Deteksi Tautan Phishing Cerdas',
       shortDescription:
-          'Implementasi superclass AkunGame dengan subclass AkunFPS & AkunMOBA menggunakan pewarisan, polimorfisme, dan enkapsulasi.',
+          'Platform analisis keamanan siber bertenaga AI untuk memindai dan mendeteksi tautan atau URL phishing mencurigakan secara real-time.',
       detailedDescription:
-          'Proyek tugas ujian tengah semester mata kuliah PBO. Memodelkan sistem autentikasi dan status game multi-genre. Menggunakan enkapsulasi untuk menyembunyikan rumus MMR dan K/D ratio, serta polimorfisme untuk mencetak ringkasan stat pemain secara dinamis.',
-      techStack: ['Java', 'Dart', 'OOP Architecture', 'UML Class Diagram'],
-      dateCreated: 'Semester 4 • 2026',
-      courseSemester: 'Tugas UTS PBO',
-      pboPrinciplesUsed: ['Inheritance', 'Polymorphism', 'Encapsulation'],
-      classHierarchyDescription: 'Superclass: AkunGame -> Subclasses: AkunFPS, AkunMOBA',
-      sourceCodeSample: '''
-// Contoh Source Code Hirarki PBO
-class AkunGame {
-  final String username;
-  protected int level;
-  public AkunGame(String u, int l) { this.username = u; this.level = l; }
-  public String getStatRingkas() { return username + " (Lv." + level + ")"; }
-}
-
-class AkunFPS extends AkunGame {
-  private double kdRatio;
-  public AkunFPS(String u, int l, double kd) {
-    super(u, l);
-    this.kdRatio = kd;
-  }
-  @Override
-  public String getStatRingkas() {
-    return super.getStatRingkas() + " - K/D: " + kdRatio;
-  }
-}''',
-      simulatedExecutionLog:
-          '✓ Menguji objek AkunFPS ("Viper_X", Lv.50, KD: 3.4)\n✓ Menguji objek AkunMOBA ("LancelotGod", Lv.92, Mythic)\n✓ Menjalankan dispatch polimorfik method getStatRingkas().',
+          'Aplikasi full-stack deteksi ancaman phishing berbasis Next.js (App Router) dan TypeScript. Mengintegrasikan antarmuka web modern dengan REST API backend untuk pemindaian payload, reputasi tautan, dan deteksi domain berbahaya guna melindungi pengguna dari serangan rekayasa sosial.',
+      projectOutput:
+          'Web Scanner Interaktif & REST API Analisis URL Berbahaya Real-Time (Live di Vercel)',
+      categories: [
+        PortfolioCategory.cybersecurity,
+        PortfolioCategory.webDev,
+        PortfolioCategory.aiEngineering,
+      ],
+      techStack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'REST API', 'Vercel'],
+      dateCreated: 'Agustus 2026',
+      repoUrl: 'https://github.com/wsaktih/phishguard-ai',
+      liveUrl: 'https://phishguard-ai-vert.vercel.app',
+      threatDomain: 'Deteksi Phishing & Keamanan Web',
+      aiModelUsed: 'Threat Intelligence Heuristics & Classifier API',
+      isFeatured: true,
     ),
-    PboCourseworkItem(
-      id: 'pbo-02',
-      title: 'Sistem Reservasi & Transaksi Bank OOP (UAS PBO)',
+    SecurityAiProjectItem(
+      id: 'proj-netvision',
+      title: 'NetVision - AI Network Traffic & Intrusion Detection',
       shortDescription:
-          'Arsitektur transaksi perbankan dengan antarmuka transfer abstrak, enkapsulasi mutasi saldo, dan penanganan exception.',
+          'Sistem inspeksi paket lalu lintas jaringan dan deteksi anomali (NIDS) bertenaga machine learning dengan lapisan Explainable AI (SHAP).',
       detailedDescription:
-          'Proyek akhir semester untuk mata kuliah PBO. Menerapkan design pattern Factory Method untuk pembuatan akun giro, tabungan, dan deposito. Dilengkapi proteksi concurrency dan validasi masukan terisolasi.',
-      techStack: ['Dart', 'OOP Patterns', 'Exception Handling', 'Polymorphic Interface'],
-      dateCreated: 'Semester 4 • 2026',
-      courseSemester: 'Tugas UAS PBO',
-      pboPrinciplesUsed: ['Abstraction', 'Encapsulation', 'Interface Contract'],
-      classHierarchyDescription:
-          'Interface: ITransaksi -> Abstract: AkunPerbankan -> Subclass: RekeningTabungan, RekeningGiro',
-      sourceCodeSample: '''
-abstract class AkunPerbankan implements ITransaksi {
-  final String nomorRekening;
-  double _saldo = 0.0;
-
-  AkunPerbankan(this.nomorRekening, double saldoAwal) : _saldo = saldoAwal;
-
-  double get saldo => _saldo;
-
-  @override
-  bool validasiLimit(double nominal);
-}''',
-      simulatedExecutionLog:
-          '✓ Inisialisasi RekeningGiro dengan limit overdraft Rp 5.000.000\n✓ Menjalankan transfer antar-bank polimorfik\n✓ Enkapsulasi saldo berhasil mencegah mutasi negatif.',
-    ),
-    SoftwareAppItem(
-      id: 'app-01',
-      title: 'DevSpace - Developer Portfolio & Task Manager',
-      shortDescription:
-          'Aplikasi portofolio dan manajemen tugas lintas platform dengan animasi modern, visualisasi progress, dan sinkronisasi awan.',
-      detailedDescription:
-          'Aplikasi Flutter mutakhir yang mengkombinasikan arsitektur berorientasi objek yang rapi dengan antarmuka minimalis elegan. Menggunakan CustomPainter untuk animasi latar belakang dinamis.',
-      category: PortfolioCategory.mobile,
-      techStack: ['Flutter', 'Dart 3', 'CustomPainter', 'Provider'],
-      dateCreated: '2026',
-      platform: 'Cross-Platform (Web & Mobile)',
-      totalStars: 124,
+          'Solusi rekayasa AI dan keamanan jaringan berbasis Python. Menangkap lalu lintas paket secara real-time, mengekstraksi 23 fitur jaringan, melatih model offline Scikit-Learn (Random Forest), serta mengintegrasikan lapisan Explainable AI (XAI) melalui SHAP untuk menyajikan transparansi alasan logis di balik setiap klasifikasi ancaman siber.',
+      projectOutput:
+          'Pipeline Inspeksi Paket Jaringan dengan Model Deteksi Anomali & Lapisan Explainable AI (SHAP)',
+      categories: [
+        PortfolioCategory.cybersecurity,
+        PortfolioCategory.aiEngineering,
+      ],
+      techStack: ['Python', 'Scikit-Learn', 'SHAP (XAI)', 'Network Capture', 'Docker'],
+      dateCreated: 'Agustus 2026',
+      repoUrl: 'https://github.com/wsaktih/netvision',
+      threatDomain: 'Network Intrusion Detection System (NIDS)',
+      aiModelUsed: 'Scikit-Learn Random Forest + SHAP Explainability Layer',
       isFeatured: true,
     ),
     SoftwareAppItem(
-      id: 'app-02',
-      title: 'Smart Campus Academic Portal',
+      id: 'proj-pbpflutter',
+      title: 'Portofolio Digital & 3D Interactive Showroom',
       shortDescription:
-          'Sistem portal nilai dan presensi mahasiswa dengan dashboard analitik berbasis komponen reusable OOP.',
+          'Aplikasi portofolio digital interaktif mutakhir dengan tema kosmik gelap, integrasi model 3D spasial (.glb), dan arsitektur OOP modular.',
       detailedDescription:
-          'Aplikasi web responsif untuk pengelolaan KRS, absensi, dan unggah berkas tugas kuliah. Dibangun dengan struktur domain-driven design dan enkapsulasi service layer.',
-      category: PortfolioCategory.web,
-      techStack: ['Flutter Web', 'REST API', 'OOP Architecture', 'Material 3'],
-      dateCreated: '2026',
-      platform: 'Flutter Web & Cloud API',
-      totalStars: 89,
-    ),
-    PboCourseworkItem(
-      id: 'pbo-03',
-      title: 'Simulasi Ekosistem & Predator-Prey (PBO Praktikum)',
-      shortDescription:
-          'Simulasi komputasi ekosistem hewan menggunakan polimorfisme perilaku makan, gerak, dan reproduksi.',
-      detailedDescription:
-          'Studi kasus praktikum PBO untuk mendemonstrasikan kekuatan polimorfisme dan dynamic binding. Setiap kelas turunan hewan memiliki implementasi unik dari fungsi berburu() dan bertahanHidup().',
-      techStack: ['Java / Dart', 'Dynamic Binding', 'Simulation Algorithm'],
-      dateCreated: 'Semester 4 • 2026',
-      courseSemester: 'Praktikum PBO Lab 3',
-      pboPrinciplesUsed: ['Polymorphism', 'Abstraction', 'Inheritance'],
-      classHierarchyDescription: 'Abstract: MakhlukHidup -> Abstract: Hewan -> Subclass: Karnivora, Herbivora',
-      sourceCodeSample: '''
-abstract class MakhlukHidup {
-  void siklusHidup();
-  void adaptasi();
-}
-
-class Singa extends HewanKarnivora {
-  @override
-  void berburu() => print("Singa melacak mangsa secara berkelompok...");
-}''',
-      simulatedExecutionLog:
-          '✓ Menghasilkan grid ekosistem 10x10\n✓ 15 MakhlukHidup mengeksekusi siklusHidup() secara polimorfik\n✓ Keseimbangan populasi tercapai.',
+          'Aplikasi multi-platform berbasis Flutter dan Dart yang mengimplementasikan arsitektur berorientasi objek secara komprehensif. Menampilkan integrasi model 3D interaktif yang responsif terhadap pergerakan kursor, simulasi kosmik partikel dengan CustomPainter, serta showcase sertifikat dan katalog proyek.',
+      projectOutput:
+          'Aplikasi Multi-Platform (Web & Mobile) Interaktif dengan Rendering Model 3D Spasial (.glb)',
+      categories: [
+        PortfolioCategory.mobileDev,
+        PortfolioCategory.webDev,
+      ],
+      techStack: ['Flutter', 'Dart 3', '3D GLB', 'CustomPainter', 'Material 3'],
+      dateCreated: 'September 2026',
+      repoUrl: 'https://github.com/wsaktih/pbpflutter',
+      platform: 'Cross-Platform (Web & Mobile)',
+      framework: 'Flutter 3.x & Dart',
+      totalStars: 52,
+      isFeatured: true,
     ),
   ];
 
-  static List<PortfolioItem> getAllItems() => List.unmodifiable(_items);
+  static List<PortfolioItem> getAllItems() {
+    return List.unmodifiable(_items);
+  }
 
   static List<PortfolioItem> getItemsByCategory(PortfolioCategory category) {
     if (category == PortfolioCategory.all) {
-      return List.unmodifiable(_items);
+      return getAllItems();
     }
-    return _items.where((item) => item.category == category).toList();
+    return _items.where((item) => item.belongsToCategory(category)).toList();
   }
 
-  static List<PboCourseworkItem> getPboCoursework() {
-    return _items.whereType<PboCourseworkItem>().toList();
+  static PortfolioItem? getById(String id) {
+    try {
+      return _items.firstWhere((item) => item.id == id);
+    } catch (_) {
+      return null;
+    }
   }
 }

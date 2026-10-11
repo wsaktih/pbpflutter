@@ -41,54 +41,49 @@ class _CertificateShowcaseSectionState extends State<CertificateShowcaseSection>
   final ScrollController _horizontalScrollController = ScrollController();
   String _selectedFilter = 'Semua';
 
+  /// =========================================================================
+  /// DAFTAR SERTIFIKAT PRESTASI & KOMPETENSI
+  /// Saat ini dikosongkan agar pengguna dapat memasukkan sertifikat sendiri.
+  /// Kategori yang didukung: 'Cybersecurity', 'IoT', 'AI Engineering', 'Mobile Dev', 'Web Dev'
+  /// =========================================================================
   static const List<CertificateItem> _certificates = [
-    CertificateItem(
-      id: 'cert-flutter',
-      title: 'Flutter & Dart Mobile App Development',
-      issuer: 'Google & Accredited Tech Academy',
-      credentialId: 'FD-AF-2024-9371',
-      issueDate: '15 Februari 2024',
-      imageAsset: 'assets/images/certificate_flutter.jpg',
-      category: 'Mobile Dev',
-      accentColor: AppColors.secondary,
-      skills: ['Flutter SDK', 'Dart OOP', 'State Management', 'Firebase Integration'],
-      description:
-          'Sertifikasi kelulusan terakreditasi dalam pengembangan aplikasi mobile profesional lintas platform '
-          'menggunakan Flutter & Dart dengan spesialisasi arsitektur bersih dan UI modern.',
-    ),
-    CertificateItem(
-      id: 'cert-pbo',
-      title: 'Certificate of Excellence: OOP & Software Architecture',
-      issuer: 'Universitas Global Teknologi - Faculty of Computer Science',
-      credentialId: 'UGT-PBO-EXC-2023-AF',
-      issueDate: '12 Oktober 2023',
-      imageAsset: 'assets/images/certificate_pbo.jpg',
-      category: 'PBO & Arsitektur',
-      accentColor: AppColors.primaryLight,
-      skills: ['Enkapsulasi', 'Inheritance', 'Polimorfisme Dinamis', 'SOLID Principles'],
-      description:
-          'Penghargaan akademik tertinggi atas penguasaan mendalam prinsip Pemrograman Berorientasi Objek (PBO), '
-          'implementasi enkapsulasi mutasi tervalidasi, serta desain perangkat lunak skalabel.',
-    ),
-    CertificateItem(
-      id: 'cert-mobile',
-      title: 'Advanced Mobile UI/UX & Cloud Engineering',
-      issuer: 'Global Tech Institute',
-      credentialId: 'AFU20230001AMUCE',
-      issueDate: '24 Oktober 2023',
-      imageAsset: 'assets/images/certificate_mobile.jpg',
-      category: 'UI/UX & Cloud',
-      accentColor: AppColors.accent,
-      skills: ['Responsive UI', 'Modern UX', 'Cloud Deployment', 'Optimization'],
-      description:
-          'Sertifikasi kompetensi rekayasa antarmuka pengguna interaktif (UI/UX) digital tingkat lanjut '
-          'dan integrasi infrastruktur komputasi awan (Cloud Native) untuk aplikasi mobile.',
-    ),
+    // TEMPLATE SERTIFIKAT: Masukkan data sertifikat Anda di sini, contoh:
+    // CertificateItem(
+    //   id: 'cert-01',
+    //   title: 'Sertifikasi Keamanan Siber & Ethical Hacking',
+    //   issuer: 'National Cyber Security Academy',
+    //   credentialId: 'CS-CERT-2026-001',
+    //   issueDate: '2026',
+    //   imageAsset: 'assets/images/certificate_cyber.jpg',
+    //   category: 'Cybersecurity', // Cybersecurity | IoT | AI Engineering | Mobile Dev | Web Dev
+    //   accentColor: AppColors.secondary,
+    //   skills: ['Penetration Testing', 'Network Defense', 'Incident Response'],
+    //   description: 'Sertifikasi kompetensi analisis keamanan siber dan perlindungan infrastruktur.',
+    // ),
   ];
 
   List<CertificateItem> get _filteredCertificates {
     if (_selectedFilter == 'Semua') return _certificates;
-    return _certificates.where((c) => c.category == _selectedFilter).toList();
+    return _certificates
+        .where((c) => c.category.toLowerCase().trim() == _selectedFilter.toLowerCase().trim())
+        .toList();
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'Cybersecurity':
+        return Icons.security_rounded;
+      case 'IoT':
+        return Icons.sensors_rounded;
+      case 'AI Engineering':
+        return Icons.psychology_rounded;
+      case 'Mobile Dev':
+        return Icons.phone_android_rounded;
+      case 'Web Dev':
+        return Icons.language_rounded;
+      default:
+        return Icons.grid_view_rounded;
+    }
   }
 
   @override
@@ -118,7 +113,14 @@ class _CertificateShowcaseSectionState extends State<CertificateShowcaseSection>
 
   @override
   Widget build(BuildContext context) {
-    final categories = ['Semua', 'Mobile Dev', 'PBO & Arsitektur', 'UI/UX & Cloud'];
+    final categories = [
+      'Semua',
+      'Cybersecurity',
+      'IoT',
+      'AI Engineering',
+      'Mobile Dev',
+      'Web Dev',
+    ];
     final list = _filteredCertificates;
 
     return Container(
@@ -168,7 +170,7 @@ class _CertificateShowcaseSectionState extends State<CertificateShowcaseSection>
                     Text(
                       'Kredensial Profesional & Prestasi Terverifikasi',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.normal,
                             color: AppColors.textPrimary,
                           ),
                     ),
@@ -176,47 +178,48 @@ class _CertificateShowcaseSectionState extends State<CertificateShowcaseSection>
                 ),
               ),
 
-              // Kontrol Tombol Scroll Kiri & Kanan untuk ListView
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    onPressed: () => _scroll(-380),
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 16),
-                    tooltip: 'Geser ke Kiri',
-                    style: IconButton.styleFrom(
-                      backgroundColor: AppColors.bgDark,
-                      foregroundColor: AppColors.textPrimary,
-                      side: const BorderSide(color: AppColors.glassBorder),
+              // Kontrol Tombol Scroll Kiri & Kanan (hanya tampil jika daftar ada isinya)
+              if (list.isNotEmpty)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: () => _scroll(-380),
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 16),
+                      tooltip: 'Geser ke Kiri',
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.bgDark,
+                        foregroundColor: AppColors.textPrimary,
+                        side: const BorderSide(color: AppColors.glassBorder),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    onPressed: () => _scroll(380),
-                    icon: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-                    tooltip: 'Geser ke Kanan',
-                    style: IconButton.styleFrom(
-                      backgroundColor: AppColors.bgDark,
-                      foregroundColor: AppColors.textPrimary,
-                      side: const BorderSide(color: AppColors.glassBorder),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: () => _scroll(380),
+                      icon: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                      tooltip: 'Geser ke Kanan',
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.bgDark,
+                        foregroundColor: AppColors.textPrimary,
+                        side: const BorderSide(color: AppColors.glassBorder),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
             ],
           ),
 
           const SizedBox(height: 14),
 
           const Text(
-            'Dokumen sertifikasi resmi dalam format ListView.builder interaktif. '
-            'Gerakkan pointer di atas sertifikat untuk melihat efek perspektif 3D Tilt dan klik untuk memperbesar HD.',
+            'Dokumen sertifikasi dan kredensial resmi. '
+            'Pilih kategori untuk memfilter sertifikat berdasarkan bidang keahlian kompetensi.',
             style: TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.6),
           ),
 
           const SizedBox(height: 20),
 
-          // Filter Chips
+          // Filter Chips (Semua, Cybersecurity, IoT, AI Engineering, Mobile Dev, Web Dev)
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -225,8 +228,19 @@ class _CertificateShowcaseSectionState extends State<CertificateShowcaseSection>
                 return Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: FilterChip(
-                    label: Text(cat),
                     selected: isSelected,
+                    label: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _getCategoryIcon(cat),
+                          size: 14,
+                          color: isSelected ? Colors.white : AppColors.textSecondary,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(cat),
+                      ],
+                    ),
                     onSelected: (val) {
                       setState(() => _selectedFilter = cat);
                     },
@@ -238,7 +252,7 @@ class _CertificateShowcaseSectionState extends State<CertificateShowcaseSection>
                       fontSize: 12.5,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                       side: BorderSide(
                         color: isSelected ? AppColors.primaryLight : AppColors.glassBorder,
                       ),
@@ -251,34 +265,123 @@ class _CertificateShowcaseSectionState extends State<CertificateShowcaseSection>
 
           const SizedBox(height: 24),
 
-          // IMPLEMENTASI LISTVIEW.BUILDER UNTUK SERTIFIKAT
-          SizedBox(
-            height: 480,
-            child: list.isEmpty
-                ? const Center(
-                    child: Text(
-                      'Tidak ada sertifikat dalam kategori ini.',
-                      style: TextStyle(color: AppColors.textSecondary),
+          // IMPLEMENTASI LISTVIEW.BUILDER ATAU TAMPILAN INFORMATIF (BELUM ADA / TIDAK DITEMUKAN)
+          if (list.isEmpty)
+            _buildEmptyCertificateState(_selectedFilter)
+          else
+            SizedBox(
+              height: 480,
+              child: ListView.builder(
+                controller: _horizontalScrollController,
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                itemCount: list.length,
+                itemBuilder: (context, index) {
+                  final cert = list[index];
+                  return Container(
+                    width: 360,
+                    margin: EdgeInsets.only(
+                      right: index == list.length - 1 ? 0 : 20,
+                      top: 8,
+                      bottom: 8,
                     ),
-                  )
-                : ListView.builder(
-                    controller: _horizontalScrollController,
-                    scrollDirection: Axis.horizontal,
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: list.length,
-                    itemBuilder: (context, index) {
-                      final cert = list[index];
-                      return Container(
-                        width: 360,
-                        margin: EdgeInsets.only(
-                          right: index == list.length - 1 ? 0 : 20,
-                          top: 8,
-                          bottom: 8,
-                        ),
-                        child: _buildCertificateCard(context, cert),
-                      );
-                    },
+                    child: _buildCertificateCard(context, cert),
+                  );
+                },
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Tampilan Informatif ketika sertifikat belum ada atau tidak ditemukan
+  Widget _buildEmptyCertificateState(String category) {
+    final isAll = category == 'Semua';
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 42),
+      decoration: BoxDecoration(
+        color: AppColors.bgDark.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: AppColors.glassBorder,
+          width: 1.2,
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.secondary.withOpacity(0.12),
+              border: Border.all(
+                color: AppColors.secondary.withOpacity(0.35),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.secondary.withOpacity(0.12),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Icon(
+              isAll ? Icons.workspace_premium_outlined : _getCategoryIcon(category),
+              size: 38,
+              color: AppColors.secondary,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            isAll ? 'Belum Ada Sertifikat' : 'Sertifikat Tidak Ditemukan',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+          ),
+          const SizedBox(height: 8),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 540),
+            child: Text(
+              isAll
+                  ? 'Saat ini belum ada sertifikat yang diunggah ke dalam portofolio.\nSertifikat kompetensi akan segera diperbarui dan dapat dimasukkan secara mandiri.'
+                  : 'Belum ada dokumen sertifikat yang terdaftar untuk kategori "$category".\nData sertifikat dapat ditambahkan pada koleksi saat dokumen telah tersedia.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 13.5,
+                color: AppColors.textSecondary,
+                height: 1.6,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.bgSurface.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.glassBorder),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.info_outline_rounded, size: 15, color: AppColors.textMuted),
+                const SizedBox(width: 8),
+                Text(
+                  'Kategori siap diisi: Cybersecurity, IoT, AI Engineering, Mobile Dev, Web Dev',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textMuted.withOpacity(0.9),
                   ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

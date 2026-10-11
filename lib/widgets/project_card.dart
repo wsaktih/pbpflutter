@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/portfolio_item.dart';
 import '../theme/app_colors.dart';
 
-/// Kartu Proyek Minimalis Elegan dengan Transisi Hover Halus (Non-3D Tilt)
-/// Menampilkan: Nama Project, Deskripsi Project, Output Project, dan Bahasa Pemrograman yang dipakai.
+/// Kartu Proyek Minimalis Elegan dengan Transisi Hover Halus
+/// Menampilkan: Nama Project, Deskripsi Project, Output Project, Bahasa/Teknologi, serta Tautan Repositori GitHub & Demo.
 class ProjectCard extends StatefulWidget {
   final PortfolioItem item;
   final int index;
@@ -21,23 +23,46 @@ class ProjectCard extends StatefulWidget {
 class _ProjectCardState extends State<ProjectCard> {
   bool _isHovered = false;
 
-  String _getProjectOutput(PortfolioItem item) {
-    if (item.id == 'pbo-01') {
-      return 'Aplikasi Simulasi Akun Game Multi-Genre & Hirarki Polimorfisme';
-    } else if (item.id == 'pbo-02') {
-      return 'Engine Transaksi Perbankan OOP Terenkapsulasi & Proteksi Mutasi Saldo';
-    } else if (item.id == 'app-01') {
-      return 'Aplikasi Mobile Android/iOS & Web Dashboard Task Manager Terintegrasi Cloud';
-    } else if (item.id == 'app-02') {
-      return 'Web Service API & Portal Evaluasi Kinerja Akademik Mahasiswa';
+  Future<void> _openExternalUrl(BuildContext context, String urlString) async {
+    try {
+      final uri = Uri.parse(urlString);
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched && context.mounted) {
+        _copyUrlToClipboard(context, urlString);
+      }
+    } catch (_) {
+      if (context.mounted) {
+        _copyUrlToClipboard(context, urlString);
+      }
     }
-    return 'Aplikasi Sistem Perangkat Lunak Terintegrasi';
+  }
+
+  void _copyUrlToClipboard(BuildContext context, String urlString) {
+    Clipboard.setData(ClipboardData(text: urlString));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_rounded, color: AppColors.secondary, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Tautan berhasil disalin: $urlString',
+                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF1E293B),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final color = widget.item.getCategoryColor();
-    final outputText = _getProjectOutput(widget.item);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -70,7 +95,7 @@ class _ProjectCardState extends State<ProjectCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Baris Atas: Indeks Proyek & Badge Kategori
+            // Baris Atas: Indeks Proyek & Badge Kategori & Tanggal
             Row(
               children: [
                 Container(
@@ -86,15 +111,32 @@ class _ProjectCardState extends State<ProjectCard> {
                       Icon(widget.item.getItemIcon(), size: 14, color: color),
                       const SizedBox(width: 6),
                       Text(
-                        'Proyek #${widget.index + 1}',
+                        'Project #${widget.index + 1}',
                         style: TextStyle(
                           fontSize: 11,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           color: color,
                           letterSpacing: 0.5,
                         ),
                       ),
                     ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.bgDark,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: AppColors.glassBorder),
+                  ),
+                  child: Text(
+                    widget.item.getCategoryBadge(),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ),
                 const Spacer(),
@@ -110,14 +152,14 @@ class _ProjectCardState extends State<ProjectCard> {
 
             const SizedBox(height: 16),
 
-            // 1. NAMA PROJECT
+            // 1. NAMA PROJECT (Font tidak terlalu bold agar mudah dibaca)
             Text(
               widget.item.title,
               style: const TextStyle(
                 fontSize: 18.5,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
-                letterSpacing: -0.3,
+                letterSpacing: -0.2,
                 height: 1.3,
               ),
             ),
@@ -157,20 +199,20 @@ class _ProjectCardState extends State<ProjectCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'OUTPUT PROYEK:',
+                          'OUTPUT PROJECT:',
                           style: TextStyle(
                             fontSize: 10,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
                             color: AppColors.secondary,
                             letterSpacing: 0.8,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          outputText,
+                          widget.item.projectOutput,
                           style: const TextStyle(
                             fontSize: 12.5,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
                             color: Colors.white,
                             height: 1.4,
                           ),
@@ -194,7 +236,7 @@ class _ProjectCardState extends State<ProjectCard> {
                   'Bahasa & Teknologi:',
                   style: TextStyle(
                     fontSize: 11,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textMuted,
                   ),
                 ),
@@ -223,6 +265,43 @@ class _ProjectCardState extends State<ProjectCard> {
                   ),
                 );
               }).toList(),
+            ),
+
+            const SizedBox(height: 18),
+
+            // 5. TOMBOL TAUTAN (GITHUB REPOSITORY & LIVE DEMO)
+            Wrap(
+              spacing: 10,
+              runSpacing: 8,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => _openExternalUrl(context, widget.item.repoUrl),
+                  icon: const Icon(Icons.code_rounded, size: 15),
+                  label: const Text('Lihat Repo GitHub'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: AppColors.glassBorder),
+                    backgroundColor: AppColors.bgDark.withOpacity(0.8),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                if (widget.item.liveUrl != null)
+                  ElevatedButton.icon(
+                    onPressed: () => _openExternalUrl(context, widget.item.liveUrl!),
+                    icon: const Icon(Icons.open_in_new_rounded, size: 15),
+                    label: const Text('Buka Live Demo'),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.black,
+                      backgroundColor: AppColors.secondary,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+              ],
             ),
           ],
         ),

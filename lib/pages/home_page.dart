@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/models.dart';
 import '../services/portfolio_service.dart';
 import '../theme/app_colors.dart';
@@ -123,7 +125,7 @@ class _HomePageState extends State<HomePage> {
 
                     const SizedBox(height: 32),
 
-                    // Section 3: Katalog Proyek & Tugas Kuliah menggunakan ListView.builder
+                    // Section 3: Koleksi Project menggunakan ListView.builder
                     Container(
                       key: _projectsKey,
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
@@ -462,13 +464,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// =========================================================================
-  /// FITUR 3: LISTVIEW.BUILDER UNTUK DAFTAR PROYEK & TUGAS KULIAH
+  /// FITUR 3: LISTVIEW.BUILDER UNTUK DAFTAR KOLEKSI PROJECT
   /// =========================================================================
   Widget _buildProjectsListBuilderSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Judul Bagian
+        // Judul Bagian: Koleksi Project
         Row(
           children: [
             Container(
@@ -488,16 +490,16 @@ class _HomePageState extends State<HomePage> {
                     'PORTFOLIO SHOWCASE',
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.secondary,
                       letterSpacing: 1.2,
                     ),
                   ),
                   Text(
-                    'Koleksi Proyek & Tugas Akademik',
+                    'Koleksi Project',
                     style: TextStyle(
                       fontSize: 26,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                       letterSpacing: -0.5,
                     ),
@@ -510,7 +512,7 @@ class _HomePageState extends State<HomePage> {
 
         const SizedBox(height: 16),
 
-        // Filter Bar (Tabs)
+        // Filter Bar (Tabs: Semua, Cybersecurity, Web Dev, Mobile Dev, IoT, AI Engineering)
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -555,24 +557,128 @@ class _HomePageState extends State<HomePage> {
 
         const SizedBox(height: 24),
 
-        // PENGGUNAAN LISTVIEW.BUILDER (Vertical List Builder untuk Proyek)
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _filteredItems.length,
-          itemBuilder: (context, index) {
-            final item = _filteredItems[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: ProjectCard(
-                item: item,
-                index: index,
-              ),
-            );
-          },
-        ),
+        // Tampilkan Empty State jika kategori belum memiliki proyek di GitHub, atau ListView.builder jika ada proyek
+        if (_filteredItems.isEmpty)
+          _buildEmptyCategoryState(_selectedCategory)
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _filteredItems.length,
+            itemBuilder: (context, index) {
+              final item = _filteredItems[index];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: ProjectCard(
+                  item: item,
+                  index: index,
+                ),
+              );
+            },
+          ),
       ],
     );
+  }
+
+  /// Tampilan Informatif saat kategori belum memiliki proyek di repositori GitHub @wsaktih (Bukan Proyek Ghoib)
+  Widget _buildEmptyCategoryState(PortfolioCategory category) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+      decoration: BoxDecoration(
+        color: AppColors.bgSurface.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.glassBorder,
+          width: 1.2,
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.secondary.withOpacity(0.12),
+              border: Border.all(
+                color: AppColors.secondary.withOpacity(0.35),
+                width: 1.5,
+              ),
+            ),
+            child: Icon(
+              category.icon,
+              size: 36,
+              color: AppColors.secondary,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            'Belum Ada Project',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+          ),
+          const SizedBox(height: 8),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520),
+            child: Text(
+              'Belum ada repositori untuk kategori "${category.label}" di akun GitHub @wsaktih.\nProyek untuk kategori ini belum dipublikasikan atau masih dalam tahap riset & pengembangan.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 13.5,
+                color: AppColors.textSecondary,
+                height: 1.6,
+              ),
+            ),
+          ),
+          const SizedBox(height: 22),
+          OutlinedButton.icon(
+            onPressed: _openGitHubProfile,
+            icon: const Icon(Icons.code_rounded, size: 16),
+            label: const Text('Kunjungi GitHub @wsaktih'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.secondary,
+              side: BorderSide(color: AppColors.secondary.withOpacity(0.6)),
+              backgroundColor: AppColors.bgDark.withOpacity(0.8),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openGitHubProfile() async {
+    const url = 'https://github.com/wsaktih';
+    try {
+      final uri = Uri.parse(url);
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched && mounted) {
+        Clipboard.setData(const ClipboardData(text: url));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Tautan GitHub disalin: https://github.com/wsaktih'),
+            backgroundColor: Color(0xFF1E293B),
+          ),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        Clipboard.setData(const ClipboardData(text: url));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Tautan GitHub disalin: https://github.com/wsaktih'),
+            backgroundColor: Color(0xFF1E293B),
+          ),
+        );
+      }
+    }
   }
 
 

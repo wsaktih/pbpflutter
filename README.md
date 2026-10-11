@@ -19,7 +19,7 @@ animasi kosmik, model 3D interaktif**
 - [Gambaran Umum](#-gambaran-umum)
 - [Alur Aplikasi](#-alur-aplikasi)
 - [Tampilan & Output Setiap Halaman](#-tampilan--output-setiap-halaman)
-- [Implementasi Konsep PBO](#-implementasi-konsep-pbo)
+- [Implementasi Katalog Mahasiswa](#-implementasi-katalog-mahasiswa)
 - [Struktur Direktori](#-struktur-direktori)
 - [Teknologi & Dependensi](#-teknologi--dependensi)
 - [Cara Menjalankan](#-cara-menjalankan)
@@ -31,7 +31,7 @@ animasi kosmik, model 3D interaktif**
 
 | Item | Keterangan |
 | --- | --- |
-| **Nama App** | Portofolio Digital & Laboratorium PBO |
+| **Nama App** | Portofolio Digital & Katalog Mahasiswa |
 | **Pemilik** | Wishang — Informatics Engineer |
 | **Halaman awal** | `LoginPage` (Visitor Access Pass) |
 | **Tema** | Dark mode — Obsidian, Indigo neon, Cyan glow, Emerald |
@@ -141,7 +141,7 @@ Filter chip: **Semua Koleksi · Tugas Matkul PBO · Aplikasi Mobile · Web & Bac
 
 | Panel | Isi |
 | --- | --- |
-| **Viewport 3D** | Avatar dirender dengan `Matrix4` (perspektif). Bisa diputar dengan cara di-drag (_trackball_). Ada grid sci-fi, refleksi kaca, dan satelit orbit (Flutter 3D, PBO A+, Dart OOP, Software Architect) |
+| **Viewport 3D** | Avatar dirender dengan ketebalan fisik padat (Solid 3D Continuous Cylinder Mantle Matrix4 tanpa duplikasi irisan), foto profil dua sisi identik (depan & belakang), dan satelit orbit (Cybersecurity, IoT, Software Engineering, AI Engineering) |
 | **Pilih Skin** | 🤖 3D Cyber Dev · 🌐 Holo Matrix · 📷 Realistis |
 | **Kontrol Dinamika** | Auto Orbit 360° / Jeda, Reset, slider **Yaw (Y)** & **Pitch (X)** |
 | **Toggle Efek** | Scanlines CRT · Cincin Giroskop · Satelit Orbit |
@@ -155,7 +155,7 @@ Filter chip: **Semua Koleksi · Tugas Matkul PBO · Aplikasi Mobile · Web & Bac
 
 | Platform | Handle |
 | --- | --- |
-| GitHub | [@wsaktih-cmyk](https://github.com/wsaktih-cmyk) |
+| GitHub | [@wsaktih](https://github.com/wsaktih) |
 | Instagram | [@wishangskt](https://instagram.com/wishangskt) |
 | TikTok | [@wshngskt](https://tiktok.com/@wshngskt_) |
 
@@ -306,12 +306,12 @@ classDiagram
         <<interface>>
         +runInteractiveDemonstration()
     }
-    PortfolioItem <|-- PboCourseworkItem
+    PortfolioItem <|-- SecurityAiProjectItem
     PortfolioItem <|-- SoftwareAppItem
-    InteractiveDemonstrable <|.. PboCourseworkItem
+    InteractiveDemonstrable <|.. SecurityAiProjectItem
 ```
 
-- `enum PortfolioCategory` → `all`, `pbo`, `mobile`, `web` (beserta label dan ikon).
+- `enum PortfolioCategory` → `all`, `cybersecurity`, `webDev`, `mobileDev`, `iot`, `aiEngineering` (beserta label dan ikon).
 - Setter `rating` divalidasi pada rentang **0.0–5.0**, dan `viewsCount` tidak boleh negatif.
 
 </details>
@@ -431,7 +431,7 @@ flutter analyze               # Cek lint
 
 **Wishang** — Informatics Engineer
 
-[![GitHub](https://img.shields.io/badge/GitHub-wsaktih--cmyk-181717?logo=github)](https://github.com/wsaktih-cmyk)
+[![GitHub](https://img.shields.io/badge/GitHub-wsaktih-181717?logo=github)](https://github.com/wsaktih)
 [![Instagram](https://img.shields.io/badge/Instagram-wishangskt-E1306C?logo=instagram&logoColor=white)](https://instagram.com/wishangskt)
 [![TikTok](https://img.shields.io/badge/TikTok-wshngskt-000000?logo=tiktok&logoColor=white)](https://tiktok.com/@wshngskt_)
 

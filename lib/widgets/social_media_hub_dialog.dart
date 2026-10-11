@@ -37,11 +37,11 @@ class SocialMediaHubDialog extends StatelessWidget {
   static const List<SocialProfile> _profiles = [
     SocialProfile(
       platform: 'GitHub',
-      handle: '@wsaktih-cmyk',
-      url: 'https://github.com/wsaktih-cmyk',
+      handle: '@wsaktih',
+      url: 'https://github.com/wsaktih',
       icon: Icons.code_rounded,
       brandColor: Colors.white,
-      description: 'Repositori tugas dan proyek lainnya.',
+      description: 'Repositori project, tugas, dan karya rekayasa software.',
     ),
     SocialProfile(
       platform: 'Instagram',
