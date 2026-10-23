@@ -78,7 +78,7 @@ class SocialMediaHubDialog extends StatelessWidget {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: AppColors.bgCard,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
       ),
@@ -95,7 +95,7 @@ class SocialMediaHubDialog extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 580),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF0F172A),
+              color: AppColors.bgSurface,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(color: AppColors.secondary.withOpacity(0.4)),
               boxShadow: [

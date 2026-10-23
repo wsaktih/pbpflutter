@@ -34,7 +34,7 @@ animasi kosmik, model 3D interaktif**
 | **Nama App** | Portofolio Digital & Katalog Mahasiswa |
 | **Pemilik** | Wishang — Informatics Engineer |
 | **Halaman awal** | `LoginPage` (Visitor Access Pass) |
-| **Tema** | Dark mode — Obsidian, Indigo neon, Cyan glow, Emerald |
+| **Tema** | Dark mode — Oren Emas Hitam (Obsidian, Neon Orange, Cyber Gold, Amber) |
 | **Font** | Plus Jakarta Sans & Outfit (Google Fonts) |
 | **Responsif** | Layout desktop (lebar > 900/960 px) & mobile |
 
@@ -42,7 +42,7 @@ animasi kosmik, model 3D interaktif**
 
 - 🔐 **Login kreatif** bergaya _Cyber Gateway_ dengan simulasi verifikasi bertahap.
 - 🧑‍🚀 **Foto profil lingkaran 3D** dengan tilt mengikuti kursor, ring gradasi berputar, dan satelit orbit.
-- 🤖 **Model 3D `.glb` asli** (robot) yang bisa diputar 360° dan punya 4 animasi.
+- 🤖 **Model 3D `.glb` asli**: Karakter robot ber-outfit techwear oren-emas-hitam yang berjoget (dancing) secara ritmis interaktif dan dapat diputar 360°.
 - 🌐 **Dialog Profil 3D Holo**: skin avatar, slider rotasi, efek scanline, dan cincin giroskop.
 - 🏅 **Galeri sertifikat** dengan filter kategori dan _lightbox_.
 - 📂 **Katalog proyek** memakai `ListView.builder` dengan filter kategori.
@@ -387,10 +387,10 @@ tugas_flutter/
 
 | Token | Hex | Peran |
 | --- | --- | --- |
-| `bgDark` | `#090D16` | Latar utama |
-| `bgSurface` | `#0F172A` | Kartu / panel |
-| `primary` | `#6366F1` | Indigo neon |
-| `secondary` | `#06B6D4` | Cyan glow |
+| `bgDark` | `#0C0A09` | Latar utama (Obsidian) |
+| `bgSurface` | `#171412` | Kartu / panel (Carbon) |
+| `primary` | `#FF7A00` | Neon Cyber Orange |
+| `secondary` | `#FFB800` | Radiant Cyber Gold |
 | `accent` | `#10B981` | Emerald |
 | `accentRose` | `#F43F5E` | Error / hapus |
 | `accentAmber` | `#F59E0B` | Cum Laude / peringatan |

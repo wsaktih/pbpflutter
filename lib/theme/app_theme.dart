@@ -18,7 +18,7 @@ class AppTheme {
         background: AppColors.bgDark,
         error: AppColors.accentRose,
         onPrimary: Colors.white,
-        onSecondary: Colors.white,
+        onSecondary: Colors.black,
         onSurface: AppColors.textPrimary,
         onBackground: AppColors.textPrimary,
       ),

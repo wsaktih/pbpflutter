@@ -140,7 +140,7 @@ class NavBar extends StatelessWidget {
                 _buildActionLink(
                   icon: Icons.school_rounded,
                   label: 'Katalog Mahasiswa',
-                  color: const Color(0xFF00A3FF),
+                  color: AppColors.secondary,
                   isHighlighted: true,
                   onTap: () => Navigator.push(
                     context,
@@ -159,7 +159,7 @@ class NavBar extends StatelessWidget {
                     context,
                     MaterialPageRoute(builder: (context) => MahasiswaPage(currentUser: currentUser)),
                   ),
-                  icon: const Icon(Icons.school_rounded, color: Color(0xFF00A3FF), size: 20),
+                  icon: const Icon(Icons.school_rounded, color: AppColors.secondary, size: 20),
                   tooltip: 'Katalog Mahasiswa',
                 ),
                 IconButton(

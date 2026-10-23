@@ -415,7 +415,7 @@ class _HomePageState extends State<HomePage> {
           icon: Icon(Icons.hub_rounded, size: isMobile ? 16 : 18, color: AppColors.secondary),
           label: const Text('Sosial Media & Tautan'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1E293B),
+            backgroundColor: AppColors.bgCard,
             foregroundColor: Colors.white,
             side: BorderSide(color: AppColors.secondary.withOpacity(0.55)),
             elevation: 3,
@@ -440,14 +440,14 @@ class _HomePageState extends State<HomePage> {
               builder: (context) => MahasiswaPage(currentUser: widget.currentUser),
             ),
           ),
-          icon: Icon(Icons.school_rounded, size: isMobile ? 16 : 18, color: const Color(0xFF00A3FF)),
+          icon: Icon(Icons.school_rounded, size: isMobile ? 16 : 18, color: AppColors.secondary),
           label: const Text('Katalog Mahasiswa'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF0F172A),
+            backgroundColor: AppColors.bgSurface,
             foregroundColor: Colors.white,
-            side: const BorderSide(color: Color(0xFF00A3FF), width: 1.2),
+            side: const BorderSide(color: AppColors.secondary, width: 1.2),
             elevation: 3,
-            shadowColor: const Color(0xFF00A3FF).withOpacity(0.25),
+            shadowColor: AppColors.secondary.withOpacity(0.25),
             padding: EdgeInsets.symmetric(
               horizontal: isMobile ? 16 : 20,
               vertical: isMobile ? 12 : 15,
@@ -664,7 +664,7 @@ class _HomePageState extends State<HomePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Tautan GitHub disalin: https://github.com/wsaktih'),
-            backgroundColor: Color(0xFF1E293B),
+            backgroundColor: AppColors.bgCard,
           ),
         );
       }
@@ -674,7 +674,7 @@ class _HomePageState extends State<HomePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Tautan GitHub disalin: https://github.com/wsaktih'),
-            backgroundColor: Color(0xFF1E293B),
+            backgroundColor: AppColors.bgCard,
           ),
         );
       }

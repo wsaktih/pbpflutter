@@ -53,7 +53,7 @@ class _ProjectCardState extends State<ProjectCard> {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: AppColors.bgCard,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
       ),

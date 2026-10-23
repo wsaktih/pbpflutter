@@ -318,9 +318,9 @@ class _CircularProfileAvatarState extends State<CircularProfileAvatar>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFF1E293B),
-                Color(0xFF0F172A),
-                Color(0xFF070B14),
+                AppColors.bgCard,
+                AppColors.bgSurface,
+                AppColors.bgDark,
               ],
             ),
             border: Border.all(

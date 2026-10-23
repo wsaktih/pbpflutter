@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import '../theme/app_colors.dart';
 
-/// Widget Penampil Model 3D GLB Cyber Android Warna Biru (Seamless / Borderless)
-/// Menampilkan karakter 3D animated GLB interaktif secara bebas melayang tanpa kotak pembatas,
-/// dengan tombol kontrol animasi (Santai, Jalan, Lari, Sapa) yang bersih dan enak dipandang.
+/// Widget Penampil Model 3D GLB Cyber Android Ber-Outfit (Tampilan Tunggal: Joget)
+/// Menampilkan karakter 3D animated GLB interaktif berbalut outfit techwear oren-emas-hitam
+/// dengan satu tampilan aksi tunggal: joget (dancing) yang energik & ritmis.
 class Glb3DCharacterViewer extends StatefulWidget {
   final String glbAssetPath;
   final double width;
@@ -17,7 +17,7 @@ class Glb3DCharacterViewer extends StatefulWidget {
     this.glbAssetPath = 'assets/models/character.glb',
     this.width = 220,
     this.height = 295,
-    this.animationName = 'idle',
+    this.animationName = 'joget',
     this.autoRotate = true,
   });
 
@@ -31,13 +31,7 @@ class _Glb3DCharacterViewerState extends State<Glb3DCharacterViewer> {
   @override
   void initState() {
     super.initState();
-    _currentAnimation = widget.animationName ?? 'idle';
-  }
-
-  void _switchAnimation(String anim) {
-    setState(() {
-      _currentAnimation = anim;
-    });
+    _currentAnimation = widget.animationName ?? 'joget';
   }
 
   bool get _isTestingEnvironment {
@@ -68,8 +62,8 @@ class _Glb3DCharacterViewerState extends State<Glb3DCharacterViewer> {
                       ),
                       gradient: RadialGradient(
                         colors: [
-                          const Color(0xFF00A3FF).withOpacity(0.35),
-                          const Color(0xFF00A3FF).withOpacity(0.10),
+                          AppColors.primary.withOpacity(0.35),
+                          AppColors.secondary.withOpacity(0.12),
                           Colors.transparent,
                         ],
                       ),
@@ -87,22 +81,22 @@ class _Glb3DCharacterViewerState extends State<Glb3DCharacterViewer> {
 
           const SizedBox(height: 6),
 
-          // 2. Bar Tombol Animasi (Santai, Jalan, Lari, Sapa) yang Rapi & Enak Dipandang
+          // 2. Tampilan Tunggal: Mode Joget Cyber (Techwear Outfit Edition)
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.40),
+                color: Colors.black.withOpacity(0.55),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFF00A3FF).withOpacity(0.25),
-                  width: 1.0,
+                  color: AppColors.secondary.withOpacity(0.45),
+                  width: 1.2,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF00A3FF).withOpacity(0.12),
-                    blurRadius: 10,
+                    color: AppColors.primary.withOpacity(0.25),
+                    blurRadius: 12,
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -111,13 +105,31 @@ class _Glb3DCharacterViewerState extends State<Glb3DCharacterViewer> {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildAnimPill('idle', '🧘 Santai'),
-                  const SizedBox(width: 4),
-                  _buildAnimPill('walk', '🚶 Jalan'),
-                  const SizedBox(width: 4),
-                  _buildAnimPill('run', '🏃 Lari'),
-                  const SizedBox(width: 4),
-                  _buildAnimPill('agree', '👋 Sapa'),
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.primary,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.85),
+                          blurRadius: 6,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    '🕺 Joget Cyber (Techwear)',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: 0.4,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -147,41 +159,6 @@ class _Glb3DCharacterViewerState extends State<Glb3DCharacterViewer> {
     );
   }
 
-  Widget _buildAnimPill(String animKey, String label) {
-    final isSelected = _currentAnimation == animKey;
-    return InkWell(
-      onTap: () => _switchAnimation(animKey),
-      borderRadius: BorderRadius.circular(14),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF00A3FF)
-              : Colors.white.withOpacity(0.06),
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFF00A3FF).withOpacity(0.45),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 9.5,
-            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-            color: isSelected ? Colors.black : Colors.white70,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _build3DModelView() {
     // Di lingkungan pengujian otomatis (flutter test headless), render visual mockup
     // agar widget test tidak error karena WebView/WebGL native platform tidak ada di CPU test.
@@ -190,10 +167,10 @@ class _Glb3DCharacterViewerState extends State<Glb3DCharacterViewer> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.smart_toy_rounded, size: 48, color: Color(0xFF00A3FF)),
+            const Icon(Icons.music_note_rounded, size: 48, color: AppColors.primary),
             const SizedBox(height: 6),
             Text(
-              'Model GLB: ${widget.glbAssetPath.split('/').last}',
+              'Model GLB: Joget Techwear (Oren Emas)',
               style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
             ),
           ],
@@ -204,7 +181,7 @@ class _Glb3DCharacterViewerState extends State<Glb3DCharacterViewer> {
     return ModelViewer(
       key: ValueKey('${widget.glbAssetPath}_$_currentAnimation'),
       src: widget.glbAssetPath,
-      alt: 'Model 3D GLB Cyber Android Robot Biru',
+      alt: 'Model 3D GLB Cyber Android Robot Joget Ber-Outfit Oren Emas',
       ar: false,
       autoRotate: widget.autoRotate,
       autoRotateDelay: 0,

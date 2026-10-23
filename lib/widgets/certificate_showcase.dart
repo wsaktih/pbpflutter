@@ -675,7 +675,7 @@ class _CertificateLightboxDialog extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 960, maxHeight: 780),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF0F172A),
+              color: AppColors.bgSurface,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(color: certificate.accentColor.withOpacity(0.5)),
               boxShadow: [

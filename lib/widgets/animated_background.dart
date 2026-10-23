@@ -171,7 +171,7 @@ class _CosmicAuraPainter extends CustomPainter {
   void _drawAuraOrbs(Canvas canvas, Size size) {
     final t = progress * 2 * pi;
 
-    // Orb 1: Neon Indigo (Bergerak elips lembut di kiri atas)
+    // Orb 1: Neon Cyber Orange (Bergerak elips lembut di kiri atas)
     final orb1Center = Offset(
       size.width * 0.25 + cos(t) * 90,
       size.height * 0.28 + sin(t) * 70,
@@ -187,7 +187,7 @@ class _CosmicAuraPainter extends CustomPainter {
       ).createShader(Rect.fromCircle(center: orb1Center, radius: size.width * 0.35));
     canvas.drawCircle(orb1Center, size.width * 0.35, orb1Paint);
 
-    // Orb 2: Cyan Glow (Bergerak harmonis di kanan bawah)
+    // Orb 2: Radiant Gold Glow (Bergerak harmonis di kanan bawah)
     final orb2Center = Offset(
       size.width * 0.75 + sin(t * 0.8) * 110,
       size.height * 0.65 + cos(t * 0.8) * 80,
@@ -203,7 +203,7 @@ class _CosmicAuraPainter extends CustomPainter {
       ).createShader(Rect.fromCircle(center: orb2Center, radius: size.width * 0.38));
     canvas.drawCircle(orb2Center, size.width * 0.38, orb2Paint);
 
-    // Orb 3: Emerald Accent Pulse (Pusat tengah bawah)
+    // Orb 3: Warm Amber Accent Pulse (Pusat tengah bawah)
     final orb3Center = Offset(
       size.width * 0.5 + cos(t * 1.2) * 80,
       size.height * 0.85 + sin(t * 1.2) * 60,
@@ -211,7 +211,7 @@ class _CosmicAuraPainter extends CustomPainter {
     final orb3Paint = Paint()
       ..shader = RadialGradient(
         colors: [
-          AppColors.accent.withOpacity(0.14),
+          AppColors.primaryLight.withOpacity(0.14),
           Colors.transparent,
         ],
         stops: const [0.0, 1.0],
@@ -324,7 +324,7 @@ class _CosmicAuraPainter extends CustomPainter {
       rotX: t * 1.1,
       rotY: -t * 0.8,
       rotZ: t * 0.6,
-      color: AppColors.accent,
+      color: AppColors.primary,
     );
   }
 

@@ -1225,8 +1225,8 @@ class _Solid3DCylinderPainter extends CustomPainter {
       final spec = (refZ > 0) ? pow(refZ.clamp(0.0, 1.0), 12).toDouble() : 0.0;
 
       // Gradasi warna padat metalik titanium
-      const baseDark = Color(0xFF070B14);
-      const steelMid = Color(0xFF1E293B);
+      const baseDark = AppColors.bgDark;
+      const steelMid = AppColors.bgCard;
       final highAccent = Color.lerp(accentColor, Colors.white, 0.35)!;
 
       Color quadColor;
@@ -1254,7 +1254,7 @@ class _Solid3DCylinderPainter extends CustomPainter {
 
       // Garis tepi halus tekstur milled edge
       final rimStrokePaint = Paint()
-        ..color = Color.lerp(const Color(0xFF334155), accentColor, diff)!.withOpacity(0.35)
+        ..color = Color.lerp(AppColors.bgCardHover, accentColor, diff)!.withOpacity(0.35)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 0.6;
       canvas.drawPath(path, rimStrokePaint);
