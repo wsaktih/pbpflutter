@@ -331,13 +331,17 @@ classDiagram
 tugas_flutter/
 ├── assets/
 │   ├── images/
-│   │   ├── profile.jpeg                    # Foto profil utama
+│   │   ├── profile.jpeg                    # Foto profil utama (Wishang)
+│   │   ├── avatar_male_1.jpg               # Avatar foto profil mahasiswa (Laki-laki)
+│   │   ├── avatar_female_1.jpg             # Avatar foto profil mahasiswi (Perempuan Hijab)
+│   │   ├── avatar_female_2.jpg             # Avatar foto profil mahasiswi (Perempuan)
+│   │   ├── avatar_male_2.jpg               # Avatar foto profil mahasiswa (Laki-laki Kacamata)
 │   │   ├── avatar_3d.jpg                   # Fallback avatar 3D
 │   │   ├── certificate_flutter.jpg         # Sertifikat Flutter & Dart
 │   │   ├── certificate_pbo.jpg             # Sertifikat OOP & Architecture
 │   │   └── certificate_mobile.jpg          # Sertifikat UI/UX & Cloud
 │   └── models/
-│       └── character.glb                   # Model 3D robot (animasi idle/walk/run/agree)
+│       └── character.glb                   # Model 3D robot techwear joget fluid
 ├── lib/
 │   ├── main.dart                           # Entry point → PortfolioApp → LoginPage
 │   ├── models/

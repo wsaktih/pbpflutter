@@ -20,10 +20,32 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
   String _searchQuery = '';
   bool _onlyCumLaude = false;
 
+  /// Mapping NIM ke Gender ('L' = Laki-laki, 'P' = Perempuan)
+  late Map<String, String> _genderMap;
+
+  /// Mapping NIM ke foto profil spesifik
+  final Map<String, String> _customAvatarMap = {
+    '2024010003': 'assets/images/profile.jpeg', // Wishang: Foto Developer asli
+    '2024010001': 'assets/images/avatar_male_1.jpg', // Budi Santoso: Laki-laki
+    '2024010002': 'assets/images/avatar_female_1.jpg', // Siti Rahayu: Perempuan (Hijab)
+    '2024010004': 'assets/images/avatar_female_2.jpg', // Dewi Permata: Perempuan
+    '2024010005': 'assets/images/avatar_male_2.jpg', // Rizky Pratama: Laki-laki (Kacamata)
+  };
+
   @override
   void initState() {
     super.initState();
     _initDataset();
+  }
+
+  void _resetGenderMap() {
+    _genderMap = {
+      '2024010001': 'L', // Budi Santoso (Laki-laki)
+      '2024010002': 'P', // Siti Rahayu (Perempuan)
+      '2024010003': 'L', // Wishang (Laki-laki)
+      '2024010004': 'P', // Dewi Permata (Perempuan)
+      '2024010005': 'L', // Rizky Pratama (Laki-laki)
+    };
   }
 
   // ===========================================================================
@@ -32,6 +54,7 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
 
   /// Function 1 — Inisialisasi dataset awal mahasiswa
   void _initDataset() {
+    _resetGenderMap();
     _daftarMahasiswa = [
       MahasiswaModel(
         nim: '2024010001',
@@ -146,6 +169,7 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
     required int semester,
     required double ipk,
     required int totalSks,
+    String? gender,
   }) {
     try {
       final mahasiswaBaru = MahasiswaModel(
@@ -157,7 +181,12 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
         ipk: ipk,
         totalSks: totalSks,
       );
-      setState(() => _daftarMahasiswa.insert(0, mahasiswaBaru));
+      setState(() {
+        if (gender != null && gender.isNotEmpty) {
+          _genderMap[nim] = gender;
+        }
+        _daftarMahasiswa.insert(0, mahasiswaBaru);
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('✅ Mahasiswa ${mahasiswaBaru.nama} berhasil ditambahkan!'),
@@ -533,6 +562,170 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
   }
 
   // ---------------------------------------------------------------------------
+  // GENDER & AVATAR HELPERS
+  // ---------------------------------------------------------------------------
+  String _detectGender(String nama) {
+    final lower = nama.toLowerCase();
+    final femaleKeywords = [
+      'siti', 'dewi', 'putri', 'ayu', 'anisa', 'annisa', 'rahayu', 'permata',
+      'sarah', 'rina', 'maya', 'mega', 'dian', 'nur', 'fatimah', 'fitri',
+      'zahra', 'tiara', 'nadia', 'aulia', 'widya', 'linda', 'indah', 'ratna',
+      'wulandari', 'kartika', 'lestari', 'anggraini', 'safitri', 'cantika'
+    ];
+    for (final kw in femaleKeywords) {
+      if (lower.contains(kw)) return 'P';
+    }
+    return 'L';
+  }
+
+  String _getGender(MahasiswaModel m) {
+    return _genderMap[m.nim] ?? _detectGender(m.nama);
+  }
+
+  String _getGenderLabel(MahasiswaModel m) {
+    return _getGender(m) == 'P' ? 'Perempuan' : 'Laki-laki';
+  }
+
+  String _getStudentAvatar(MahasiswaModel m) {
+    if (_customAvatarMap.containsKey(m.nim)) {
+      return _customAvatarMap[m.nim]!;
+    }
+    final isMale = _getGender(m) == 'L';
+    final maleAvatars = [
+      'assets/images/avatar_male_1.jpg',
+      'assets/images/avatar_male_2.jpg',
+    ];
+    final femaleAvatars = [
+      'assets/images/avatar_female_1.jpg',
+      'assets/images/avatar_female_2.jpg',
+    ];
+    final idx = (m.nim.hashCode ^ m.nama.hashCode).abs();
+    return isMale
+        ? maleAvatars[idx % maleAvatars.length]
+        : femaleAvatars[idx % femaleAvatars.length];
+  }
+
+  Widget _buildStudentAvatar(MahasiswaModel m, {double radius = 24, bool showBadge = true}) {
+    final avatarAsset = _getStudentAvatar(m);
+    final isMale = _getGender(m) == 'L';
+    final genderColor = isMale ? const Color(0xFF38BDF8) : const Color(0xFFF472B6);
+    final statusColor = m.ipk >= 3.5
+        ? const Color(0xFFF59E0B)
+        : (m.ipk >= 3.0 ? AppColors.secondary : AppColors.accentRose);
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: radius * 2,
+          height: radius * 2,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                statusColor.withOpacity(0.95),
+                AppColors.primary.withOpacity(0.85),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: statusColor.withOpacity(0.35),
+                blurRadius: 8,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(2.2),
+          child: ClipOval(
+            child: Image.asset(
+              avatarAsset,
+              fit: BoxFit.cover,
+              width: radius * 2,
+              height: radius * 2,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: statusColor.withOpacity(0.18),
+                  alignment: Alignment.center,
+                  child: Text(
+                    m.nama.isNotEmpty ? m.nama[0].toUpperCase() : '?',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: radius * 0.75,
+                      color: statusColor,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        if (showBadge)
+          Positioned(
+            right: -2,
+            bottom: -2,
+            child: Container(
+              padding: const EdgeInsets.all(2.5),
+              decoration: BoxDecoration(
+                color: AppColors.bgSurface,
+                shape: BoxShape.circle,
+                border: Border.all(color: genderColor.withOpacity(0.9), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.5),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              child: Icon(
+                isMale ? Icons.male_rounded : Icons.female_rounded,
+                size: radius >= 24 ? 11 : 9,
+                color: genderColor,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildGenderBadge(MahasiswaModel m) {
+    final isMale = _getGender(m) == 'L';
+    final genderColor = isMale ? const Color(0xFF38BDF8) : const Color(0xFFF472B6);
+    final label = isMale ? 'L' : 'P';
+    return Tooltip(
+      message: isMale ? 'Gender: Laki-laki' : 'Gender: Perempuan',
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: genderColor.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: genderColor.withOpacity(0.4)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isMale ? Icons.male_rounded : Icons.female_rounded,
+              size: 11,
+              color: genderColor,
+            ),
+            const SizedBox(width: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: genderColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
   // KARTU MAHASISWA (CLEAN & MODERN) — menggunakan GETTER dari MahasiswaModel
   // ---------------------------------------------------------------------------
   Widget _buildMahasiswaCard(MahasiswaModel m, int fullIndex) {
@@ -574,21 +767,10 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: Avatar, Nama, NIM, Cum Laude, Menu
+            // Header: Avatar Foto Profil (Gender Matched), Nama, NIM, Cum Laude, Menu
             Row(
               children: [
-                CircleAvatar(
-                  radius: 22,
-                  backgroundColor: statusColor.withOpacity(0.18),
-                  child: Text(
-                    nama.isNotEmpty ? nama[0].toUpperCase() : '?',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 17,
-                      color: statusColor,
-                    ),
-                  ),
-                ),
+                _buildStudentAvatar(m, radius: 24),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -607,8 +789,10 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          const SizedBox(width: 6),
+                          _buildGenderBadge(m),
                           if (isCumLaude) ...[
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                               decoration: BoxDecoration(
@@ -630,7 +814,7 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'NIM: $nim  •  $jurusan',
+                        'NIM: $nim  •  ${_getGenderLabel(m)}  •  $jurusan',
                         style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -787,6 +971,9 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
   // ---------------------------------------------------------------------------
   // DIALOG: Tambah Mahasiswa
   // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // DIALOG: Tambah Mahasiswa
+  // ---------------------------------------------------------------------------
   void _showTambahDialog() {
     final nimCtrl = TextEditingController();
     final namaCtrl = TextEditingController();
@@ -795,55 +982,123 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
     final semCtrl = TextEditingController(text: '1');
     final ipkCtrl = TextEditingController(text: '3.00');
     final sksCtrl = TextEditingController(text: '20');
+    String selectedGender = 'L'; // default Laki-laki
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.bgSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('➕ Tambah Mahasiswa Baru',
-            style: TextStyle(fontWeight: FontWeight.w800)),
-        content: SizedBox(
-          width: 420,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _dialogField(nimCtrl, 'NIM', 'Misal: 2024010006'),
-                _dialogField(namaCtrl, 'Nama Lengkap', 'Misal: Rina Sari'),
-                _dialogField(emailCtrl, 'Email', 'nama@kampus.ac.id'),
-                _dialogField(jurusanCtrl, 'Jurusan', 'Teknik Informatika'),
-                _dialogField(semCtrl, 'Semester', '1 - 14',
-                    keyboardType: TextInputType.number),
-                _dialogField(ipkCtrl, 'IPK', '0.00 - 4.00',
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true)),
-                _dialogField(sksCtrl, 'Total SKS', 'Misal: 20',
-                    keyboardType: TextInputType.number),
-              ],
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: AppColors.bgSurface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('➕ Tambah Mahasiswa Baru',
+              style: TextStyle(fontWeight: FontWeight.w800)),
+          content: SizedBox(
+            width: 420,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _dialogField(nimCtrl, 'NIM', 'Misal: 2024010006'),
+                  _dialogField(namaCtrl, 'Nama Lengkap', 'Misal: Rina Sari'),
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 6, top: 4),
+                    child: Text(
+                      'Jenis Kelamin (Gender & Foto Profil):',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => setDialogState(() => selectedGender = 'L'),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: selectedGender == 'L' ? const Color(0xFF38BDF8).withOpacity(0.18) : Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: selectedGender == 'L' ? const Color(0xFF38BDF8) : AppColors.glassBorder,
+                                width: selectedGender == 'L' ? 1.5 : 1,
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.male_rounded, size: 16, color: Color(0xFF38BDF8)),
+                                SizedBox(width: 6),
+                                Text('Laki-laki', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => setDialogState(() => selectedGender = 'P'),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: selectedGender == 'P' ? const Color(0xFFF472B6).withOpacity(0.18) : Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: selectedGender == 'P' ? const Color(0xFFF472B6) : AppColors.glassBorder,
+                                width: selectedGender == 'P' ? 1.5 : 1,
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.female_rounded, size: 16, color: Color(0xFFF472B6)),
+                                SizedBox(width: 6),
+                                Text('Perempuan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _dialogField(emailCtrl, 'Email', 'nama@kampus.ac.id'),
+                  _dialogField(jurusanCtrl, 'Jurusan', 'Teknik Informatika'),
+                  _dialogField(semCtrl, 'Semester', '1 - 14',
+                      keyboardType: TextInputType.number),
+                  _dialogField(ipkCtrl, 'IPK', '0.00 - 4.00',
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+                  _dialogField(sksCtrl, 'Total SKS', 'Misal: 20',
+                      keyboardType: TextInputType.number),
+                ],
+              ),
             ),
           ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Batal')),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              onPressed: () {
+                Navigator.pop(ctx);
+                _tambahMahasiswa(
+                  nim: nimCtrl.text,
+                  nama: namaCtrl.text,
+                  email: emailCtrl.text,
+                  jurusan: jurusanCtrl.text,
+                  semester: int.tryParse(semCtrl.text) ?? 1,
+                  ipk: double.tryParse(ipkCtrl.text) ?? 0.0,
+                  totalSks: int.tryParse(sksCtrl.text) ?? 0,
+                  gender: selectedGender,
+                );
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Batal')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-            onPressed: () {
-              Navigator.pop(ctx);
-              _tambahMahasiswa(
-                nim: nimCtrl.text,
-                nama: namaCtrl.text,
-                email: emailCtrl.text,
-                jurusan: jurusanCtrl.text,
-                semester: int.tryParse(semCtrl.text) ?? 1,
-                ipk: double.tryParse(ipkCtrl.text) ?? 0.0,
-                totalSks: int.tryParse(sksCtrl.text) ?? 0,
-              );
-            },
-            child: const Text('Simpan'),
-          ),
-        ],
       ),
     );
   }
@@ -854,52 +1109,136 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
   void _showEditDialog(MahasiswaModel m) {
     final ipkCtrl = TextEditingController(text: m.ipkFormatted); // getter
     final semCtrl = TextEditingController(text: '${m.semester}'); // getter
+    String currentGender = _getGender(m);
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.bgSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('✏️ Edit Data: ${m.nama}', // getter .nama
-            style: const TextStyle(fontWeight: FontWeight.w800)),
-        content: SizedBox(
-          width: 380,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: AppColors.bgSurface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
             children: [
-              const Text(
-                'Perubahan diproses via SETTER dengan validasi otomatis.\n'
-                'IPK: 0.00 – 4.00 | Semester: 1 – 14',
-                style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+              _buildStudentAvatar(m, radius: 20, showBadge: false),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('✏️ Edit Data: ${m.nama}',
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                    Text('NIM: ${m.nim}  •  ${m.jurusan}',
+                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+                  ],
+                ),
               ),
-              const SizedBox(height: 14),
-              _dialogField(ipkCtrl, 'IPK Baru', '0.00 - 4.00',
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true)),
-              _dialogField(semCtrl, 'Semester Baru', '1 - 14',
-                  keyboardType: TextInputType.number),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Batal')),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.secondary),
-            onPressed: () {
-              Navigator.pop(ctx);
-              _updateMahasiswaViaSetter(
-                m,
-                ipkBaru: double.tryParse(ipkCtrl.text) ?? m.ipk,
-                semesterBaru: int.tryParse(semCtrl.text) ?? m.semester,
-              );
-            },
-            child: const Text('Simpan via Setter',
-                style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
+          content: SizedBox(
+            width: 380,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Perubahan diproses via SETTER dengan validasi otomatis.\n'
+                    'IPK: 0.00 – 4.00 | Semester: 1 – 14',
+                    style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                  ),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Jenis Kelamin (Gender & Foto):',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => setDialogState(() => currentGender = 'L'),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: currentGender == 'L' ? const Color(0xFF38BDF8).withOpacity(0.18) : Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: currentGender == 'L' ? const Color(0xFF38BDF8) : AppColors.glassBorder,
+                                width: currentGender == 'L' ? 1.5 : 1,
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.male_rounded, size: 16, color: Color(0xFF38BDF8)),
+                                SizedBox(width: 6),
+                                Text('Laki-laki', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () => setDialogState(() => currentGender = 'P'),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
+                              color: currentGender == 'P' ? const Color(0xFFF472B6).withOpacity(0.18) : Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: currentGender == 'P' ? const Color(0xFFF472B6) : AppColors.glassBorder,
+                                width: currentGender == 'P' ? 1.5 : 1,
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.female_rounded, size: 16, color: Color(0xFFF472B6)),
+                                SizedBox(width: 6),
+                                Text('Perempuan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _dialogField(ipkCtrl, 'IPK Baru', '0.00 - 4.00',
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true)),
+                  _dialogField(semCtrl, 'Semester Baru', '1 - 14',
+                      keyboardType: TextInputType.number),
+                ],
+              ),
+            ),
           ),
-        ],
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Batal')),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.secondary),
+              onPressed: () {
+                Navigator.pop(ctx);
+                setState(() {
+                  _genderMap[m.nim] = currentGender;
+                });
+                _updateMahasiswaViaSetter(
+                  m,
+                  ipkBaru: double.tryParse(ipkCtrl.text) ?? m.ipk,
+                  semesterBaru: int.tryParse(semCtrl.text) ?? m.semester,
+                );
+              },
+              child: const Text('Simpan via Setter',
+                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -909,14 +1248,41 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
   // ---------------------------------------------------------------------------
   void _showLaporanDialog(MahasiswaModel m) {
     final laporan = m.evaluasiKelayakanSkripsi(); // method dari MahasiswaModel
+    final isMale = _getGender(m) == 'L';
+    final genderLabel = _getGenderLabel(m);
+    final genderColor = isMale ? const Color(0xFF38BDF8) : const Color(0xFFF472B6);
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.bgSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('📊 Laporan Akademik: ${m.nama}',
-            style: const TextStyle(fontWeight: FontWeight.w800)),
+        title: Row(
+          children: [
+            _buildStudentAvatar(m, radius: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('📊 Laporan: ${m.nama}',
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      Icon(isMale ? Icons.male_rounded : Icons.female_rounded, size: 12, color: genderColor),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$genderLabel  •  ${m.nim}',
+                        style: TextStyle(fontSize: 11, color: genderColor, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         content: SizedBox(
           width: 480,
           child: SingleChildScrollView(
@@ -925,6 +1291,7 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _laporanRow('NIM', m.nim),
+                _laporanRow('Jenis Kelamin', genderLabel),
                 _laporanRow('Jurusan', m.jurusan),
                 _laporanRow('Email', m.email),
                 _laporanRow('Semester', '${m.semester}'),
