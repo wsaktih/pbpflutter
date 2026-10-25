@@ -67,7 +67,7 @@ class AuthService extends ChangeNotifier {
     return true;
   }
 
-  /// Autentikasi Mahasiswa menggunakan NIM dan Password
+  /// Autentikasi Tamu/Pengunjung menggunakan NIM dan Password
   Future<bool> loginWithNim({
     required String nim,
     required String password,
@@ -75,16 +75,34 @@ class AuthService extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    await Future.delayed(const Duration(milliseconds: 900));
+    await Future.delayed(const Duration(milliseconds: 600));
 
-    _currentUser = MahasiswaAuthorUser(
-      id: 'mhs-$nim',
+    _currentUser = DeveloperGuestUser(
+      id: 'guest-$nim',
       username: nim,
-      displayName: 'Wishang ($nim)',
-      nim: nim,
+      displayName: 'Guest',
       avatarUrl: 'assets/images/profile.jpeg',
-      programStudi: 'Teknik Informatika (Software Engineering)',
-      ipk: 3.92,
+      favoriteLanguage: 'Dart & Flutter',
+    );
+
+    _isLoading = false;
+    notifyListeners();
+    return true;
+  }
+
+  /// Autentikasi Cepat 1-Klik sebagai Guest / Tamu Pengunjung
+  Future<bool> loginAsGuest({String guestName = 'Guest'}) async {
+    _isLoading = true;
+    notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 400));
+
+    _currentUser = DeveloperGuestUser(
+      id: 'guest-${DateTime.now().millisecondsSinceEpoch}',
+      username: 'guest',
+      displayName: guestName,
+      avatarUrl: 'assets/images/profile.jpeg',
+      favoriteLanguage: 'Dart & Flutter',
     );
 
     _isLoading = false;

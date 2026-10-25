@@ -200,16 +200,16 @@ class DeveloperGuestUser extends BaseUser {
   });
 
   @override
-  String getRoleTitle() => 'Software Engineer Guest';
+  String getRoleTitle() => 'Tamu Pengunjung';
 
   @override
-  String getClearanceLevel() => 'Level 2 (Interactive Playground Access)';
+  String getClearanceLevel() => 'Level 2 (Guest Access)';
 
   @override
   Color getRoleColor() => AppColors.primary;
 
   @override
-  IconData getRoleIcon() => Icons.terminal_rounded;
+  IconData getRoleIcon() => Icons.person_outline_rounded;
 
   @override
   List<String> getPermissions() => [

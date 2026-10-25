@@ -20,6 +20,9 @@ void main() {
     expect(find.text('Wishang'), findsOneWidget);
     expect(find.text('NIM (Nomor Induk Mahasiswa)'), findsOneWidget);
     expect(find.text('Password / Kata Sandi'), findsOneWidget);
+
+    // Dispose widget tree to cancel periodic timers
+    await tester.pumpWidget(const SizedBox());
   });
 
   testWidgets('MahasiswaPage renders student cards with gender avatars', (WidgetTester tester) async {
